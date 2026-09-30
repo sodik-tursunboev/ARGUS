@@ -1,0 +1,244 @@
+/* ARGUS HUD V2 — Operations page shell.
+   This page is the scrollable detail companion to the overview dashboard.
+   Sections are stacked, responsive, and scrollable — no fixed-height
+   instrument panel. Each section follows the existing panel aesthetic. */
+
+/* Page shell: scrollable, bounded width, centered */
+.operations-page {
+  width: min(1120px, 100%);
+  max-width: 1120px;
+  margin: 16px auto;
+  display: grid;
+  gap: 12px;
+  align-items: start;
+  padding-bottom: 32px;
+}
+
+/* ---- Top status strip ---- */
+.ops-status-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  padding: 10px 14px;
+  font: 700 9px var(--mono);
+  letter-spacing: .08em;
+  color: var(--muted);
+}
+.ops-status-strip .status-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ops-status-strip .status-item b {
+  color: var(--cyan-soft);
+  font-size: 9px;
+}
+.ops-status-strip .status-item.ok b {
+  color: var(--green);
+}
+.ops-status-strip .status-item.warn b {
+  color: var(--amber);
+}
+.ops-status-strip .status-item.crit b {
+  color: var(--red);
+}
+.ops-status-strip .status-item.dim b {
+  color: var(--muted);
+}
+
+/* ---- Section headings ---- */
+.ops-section h2 {
+  font: 700 11px var(--mono);
+  letter-spacing: .1em;
+  color: var(--secondary);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.ops-section h2 .h2-icon {
+  margin-right: 6px;
+}
+
+/* ---- Process table ---- */
+.ops-process-table {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 60px 64px 52px 48px;
+  gap: 1px;
+  font-size: 10px;
+}
+.ops-process-table .proc-head {
+  color: var(--muted);
+  font: 700 9px var(--mono);
+  letter-spacing: .06em;
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.ops-process-table .proc-row {
+  display: contents;
+}
+.ops-process-table .proc-row span {
+  padding: 5px 6px;
+  color: var(--text);
+  border-bottom: 1px solid var(--line-soft);
+}
+.ops-process-table .proc-row span:first-child {
+  color: var(--cyan-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ops-process-table .proc-row span:nth-child(n+2) {
+  text-align: right;
+  color: var(--secondary);
+}
+.ops-process-empty {
+  color: var(--muted);
+  font-size: 10px;
+  padding: 8px 0;
+}
+
+/* ---- Metric cards (larger than dashboard) ---- */
+.ops-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.ops-metric-card {
+  padding: 12px;
+  border: 1px solid var(--line-soft);
+  background: rgba(2, 10, 14, .36);
+  border-radius: 2px;
+}
+.ops-metric-card .metric-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: 700 9px var(--mono);
+  color: var(--muted);
+  letter-spacing: .08em;
+  margin-bottom: 6px;
+}
+.ops-metric-card .metric-value {
+  font: 700 22px var(--data);
+  color: var(--cyan-soft);
+}
+.ops-metric-card .metric-detail {
+  font-size: 9px;
+  color: var(--secondary);
+  margin-top: 4px;
+}
+
+/* ---- Agent/task detail ---- */
+.ops-agent-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.ops-agent-grid .ops-dl {
+  display: grid;
+  gap: 6px;
+}
+.ops-agent-grid .ops-dl div {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.ops-agent-grid .ops-dl dt {
+  font: 700 9px var(--mono);
+  color: var(--muted);
+}
+.ops-agent-grid .ops-dl dd {
+  margin: 0;
+  font: 700 10px var(--mono);
+  color: var(--cyan-soft);
+  text-align: right;
+}
+
+/* ---- Anomaly/detection note ---- */
+.ops-note {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 9px;
+}
+.ops-anomaly {
+  color: var(--amber);
+}
+.ops-detect {
+  color: var(--red);
+}
+
+/* ---- Objective detail ---- */
+.ops-objective {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line-soft);
+}
+.ops-objective b {
+  display: block;
+  font: 700 9px var(--mono);
+  color: var(--muted);
+  letter-spacing: .08em;
+  margin-bottom: 5px;
+}
+.ops-objective p {
+  color: var(--secondary);
+  font-size: 11px;
+  margin: 0;
+}
+
+/* ---- Two-column layout for paired sections ---- */
+.ops-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.ops-two-col > .ops-section {
+  min-width: 0;
+}
+/* ---- Threat Monitor prominence ---- */
+.ops-two-col > .threat {
+  grid-column: 1 / -1;
+  min-height: 420px;
+}
+.panel.threat {
+  min-height: 100%;
+}
+
+/* ---- Alert / empty state ---- */
+.ops-empty {
+  color: var(--muted);
+  font-size: 10px;
+  padding: 10px 0;
+}
+
+/* ---- Timeline expanded (reuse existing EventTimeline styles) ---- */
+.ops-timeline {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* ---- Network detail ---- */
+.ops-network-detail {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: start;
+}
+.ops-network-detail .ops-dl {
+  display: grid;
+  gap: 6px;
+}
+
+/* ---- Diagnostics full-width ---- */
+.ops-diagnostics {
+  max-width: 100%;
+}
+
+/* Responsive: collapse metric grid on narrower panels */
+@media (max-width: 900px) {
+  .ops-metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ops-two-col { grid-template-columns: 1fr; }
+  .ops-agent-grid { grid-template-columns: 1fr; }
+}

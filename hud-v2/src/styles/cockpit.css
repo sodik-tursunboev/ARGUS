@@ -1,0 +1,151 @@
+/* ARGUS HUD V2 -- cockpit host + brand identity pass.
+   Layered after type.css (type + colour roles live THERE now). This file owns:
+   1. the fluid viewport host -- NO transform scaling: text keeps its designed
+      pixel size at every target; the dashboard grid flexes instead,
+   2. the bespoke ARGUS wordmark treatment,
+   3. deliberate final-polish overrides where the cockpit differs from the
+      generic defaults (panel surfaces, header geometry, micro-nav face). */
+
+/* ============================================================
+   1. THE FLUID COCKPIT HOST
+   The host is the real viewport (window.innerWidth/innerHeight via
+   normal CSS layout -- never screen.*). Accent palette used by this
+   file only; the global palette lives in type.css.
+   ============================================================ */
+:root{
+  --hud-bg:#02070a;
+  --hud-ink:#f0f9fb;            /* wordmark face: near-white, premium serif */
+  --hud-line:#134a53;           /* structural lines: dark teal */
+  --hud-line-soft:rgba(141,196,205,.13);
+  --hud-accent:#00eaf2;         /* the single bright cyan accent */
+}
+html,body,#app{min-width:0;background:var(--hud-bg)}
+#app{position:relative;min-height:100dvh}
+/* Below the 1180px cockpit floor (e.g. a narrow preview pane), the shell
+   keeps its designed geometry and the VIEWPORT scrolls -- never squeeze,
+   which would overlap the header columns. */
+.app-shell{min-width:1180px}
+.hud-viewport{overflow-x:auto}
+.hud-viewport{position:relative;min-height:100dvh;background:
+  radial-gradient(ellipse 62% 55% at 50% 44%,rgba(10,42,48,.55),transparent 70%),
+  linear-gradient(rgba(120,220,230,.016) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(120,220,230,.016) 1px,transparent 1px);
+  background-size:auto,44px 44px,44px 44px}
+.boot{position:fixed}                       /* pywebview drag-region safety */
+
+/* ============================================================
+   2. BRAND IDENTITY
+   Moved to BrandLockup.svelte (design pass 1): angular emblem + "ARGUS //
+   CORE" + "TACTICAL INTELLIGENCE GRID" in Space Grotesk. The serif
+   "A.R.G.U.S." wordmark rules that lived here were removed with it.
+   The micro strip (OBSERVE > ANALYZE > PROTECT > ASSIST) is styled by
+   Header.svelte, which owns it.
+   ============================================================ */
+
+/* ============================================================
+   3. COCKPIT-SPECIFIC OVERRIDES (everything else defers to type.css)
+   ============================================================ */
+
+/* ============================================================
+   3a. HEADER — three explicit zones, no overlap (PRIORITY 5 / §25).
+   Markup (Header.svelte): .header-left = identity lockup (+ micro strip) ·
+   .app-nav = primary navigation + MORE (centre, privileged) ·
+   .header-right = local-control tagline + clock.
+   Root cause of the old "DASHBOARDTASKSAGENTS…SECURITYMORE" run: the grid
+   gave .app-nav a minmax(0,1fr) column that could shrink BELOW its own
+   content, so the tabs painted over the tagline/clock. As flex items the
+   primary nav is flex-shrink:0 — it can NEVER be squeezed into an overlap;
+   brand/tagline/clock yield first, in collision-priority order: tagline ->
+   brand↔nav gap -> micro-nav (the right-side children shrink+truncate, the
+   nav and clock never give up a pixel).
+   ============================================================ */
+.command-header{
+  display:flex;
+  align-items:center;
+  gap:clamp(12px,1.3vw,26px);
+  padding:0 clamp(10px,1.3vw,22px);
+  min-width:0;
+  max-width:100%;
+}
+.header-right{display:flex;align-items:center;gap:clamp(9px,1vw,18px);flex:1 1 auto;min-width:0;justify-content:flex-end}
+/* Tagline is the first casualty: it may shrink+truncate, never wraps. */
+.header-right .header-mode{flex:0 1 auto;min-width:0;overflow-x:auto;white-space:nowrap}
+.header-right .clock{flex:0 0 auto;border-left:1px solid var(--line-soft);padding-left:16px;min-width:0}
+/* Primary-nav strip (icon + label, active underline, MORE trigger + caret)
+   and the MORE menu's ITEMS are styled in Header.svelte (design pass 1).
+   What stays here is the dropdown's structure only: anchored under MORE,
+   above the page, dark surface. The nav strip never dims itself any more
+   (the old container-level opacity:.65 made every label read as disabled). */
+.more-nav{position:relative;flex:0 0 auto}
+.more-nav .more-menu{position:absolute;right:0;top:calc(100% + 5px);z-index:var(--z-dropdown);background:rgba(6,16,20,.98);border:1px solid var(--line-soft);border-radius:4px;padding:6px;display:grid;gap:2px;min-width:130px;box-shadow:0 14px 30px rgba(0,0,0,.45);opacity:1}
+
+/* ---- Header viewport immunities (collision priority, §8/§9).
+   FIRST the tagline shortens ("A SAFER TOMORROW" leaves, then the whole
+   tagline); SECOND the subtitle hides + the brand↔nav gap tightens;
+   THIRD the micro-nav compacts. The primary nav and the clock never yield.
+   Font sizes stay ≥10px (non-essential only) — the nav holds 13px. ---- */
+@media (max-width:1760px){.header-mode .sep-c,.header-mode .tag-c{display:none}}
+@media (max-width:1630px){.header-mode{display:none}}
+@media (max-width:1420px){.command-header{gap:10px}}
+/* Value tones for the security rows: dim = a documented absence (NOT
+   REPORTED / DISCONNECTED / UNKNOWN), never an alert colour. */
+.security-row b.dim{color:var(--muted)}
+
+/* Panel + header surface: darker, calmer, teal-structured */
+.panel,.command-header,.rail-block{border-color:var(--line-soft);
+  background:linear-gradient(150deg,rgba(8,20,25,.92),rgba(4,11,14,.9));
+  box-shadow:inset 0 1px rgba(210,240,245,.03),0 12px 26px rgba(0,0,0,.24)}
+.panel:before,.command-header:before{border-top-color:var(--cyan);opacity:.8}
+.command-header{border-color:var(--line-soft)}
+
+/* Quick actions: calm tiles, accent only on interaction */
+.quick-grid button{border:1px solid var(--line-soft);background:rgba(9,22,27,.72)}
+.quick-grid button:hover:not(:disabled){border-color:color-mix(in srgb,var(--cyan) 55%,transparent)}
+
+/* ---- Information levels: dashboard shows STATE, details live on pages ---- */
+/* Long diagnostic values (e.g. "egress classes: 8 fixed, 1 open (SSRF-gua...")
+   collapse to their state word on the dashboard; SecurityStatus passes the
+   short form via .compact (the Security detail page shows the full value). */
+.dashboard-page .security-row b{max-width:58%;overflow-x:auto;text-overflow:ellipsis;white-space:nowrap}
+
+/* Footer signature: quiet secondary; the brand lives top-left, not here. */
+.footer-signature,.footer-owner{display:inline-flex;align-items:center;gap:10px}
+.footer-signature{font-family:var(--font-ui);letter-spacing:.14em}
+.footer-signature span:first-child{color:var(--secondary);font-weight:600}
+.pipe{color:var(--structure);opacity:.5;font-weight:300}
+
+/* ---- Real-display fit -------------------------------------------------
+   The shell caps at 2200px so ultra-wide desktops get symmetric matte,
+   not a stretched instrument; the core visual may use up to 900px so tall
+   maximized windows breathe around the ring instead of leaving a void.
+   Rails hold ~20% of the row each (reference proportion), the core keeps
+   priority with a 480px floor. */
+.app-shell{width:min(2200px,100%)}
+.core-visual{max-inline-size:min(100%,900px)}
+.dashboard-page{grid-template-columns:minmax(0,1fr) minmax(0,2.4fr) minmax(0,1fr)}
+
+/* Height-aware sizing for the 768px-class laptop target: compress the fixed
+   chrome and the rail floors -- every region stays present, nothing hides.
+   (minmax() floors + clamp() band; the grid does the fitting.) */
+@media (max-height: 820px){
+  .app-shell{padding:10px 12px 8px;gap:8px;grid-template-rows:60px minmax(0,1fr) 20px}
+  .command-header{height:60px}
+  .dashboard-page{gap:8px;grid-template-rows:minmax(0,1fr) clamp(178px,24vh,226px)}
+  .dashboard-left{grid-template-rows:minmax(150px,1.22fr) minmax(70px,.7fr) auto}
+  .dashboard-left>.panel,.dashboard-right>.panel{padding:9px 11px}
+  .dashboard-lower>.panel{padding:10px 12px}
+  .dashboard-operations{grid-template-rows:minmax(0,1fr) minmax(100px,.65fr)}
+  .dashboard-operations .quick{padding:8px 12px}
+  .dashboard-operations .quick>div{grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:26px;gap:5px;margin-top:6px}
+  .dashboard-operations .quick button{height:auto;min-height:0;padding:3px 7px;font-size:9px}
+  .dashboard-operations .quick button:last-child{grid-column:auto}
+  .dashboard-operations .command{padding:6px 12px}
+  .dashboard-right .security-summary{min-height:48px}
+  .dashboard-right .trend{height:38px}
+  .state-ladder,.security-ladder{gap:12px;top:26%}
+}
+
+/* Focus rings stay crisp without transform scaling */
+.app-shell :focus-visible{outline:2px solid color-mix(in srgb,var(--cyan) 75%,transparent);outline-offset:2px}
+/* (Reduced motion is handled globally in global.css: transition/animation
+   are forced off for every element, including the nav underline + emblem eye.) */

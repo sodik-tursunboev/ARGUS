@@ -1,0 +1,247 @@
+/* ARGUS HUD V2 — THE ARGUS CORE BAY + robot rendering (Core Bay pass).
+   Loaded AFTER core-lanes.css, BEFORE icons.css (see main.ts).
+
+   STRATEGY (this pass):
+   The robot's ORIGINAL rectangular JPG is deliberately placed inside a
+   near-black CORE BAY (#000508) whose flat colour matches the JPG's own
+   pure-black canvas. With a solid opaque bay behind it, the image can use
+   `mix-blend-mode: normal` — every pixel renders 1:1 (dark metallic armor,
+   teal circuits, green eyes preserved), and the only thing the rectangle
+   edge could show is black-on-black, which is optically invisible. No screen
+   blend, no flood-fill PNG, no cyan fog, no destructive mask over the face.
+
+   The REST of ARGUS keeps its existing tactical dark-teal material: rails,
+   lower deck and header are untouched. Only this centre region (the vault)
+   is claimed by the robot.
+
+   This sheet is the final authority for the bay surface AND the robot image;
+   it overrides the five competing background/glow rules in global.css /
+   shell.css / core-lanes.css with the !important tokens below. *//* ============================================================
+   1. THE CORE BAY — a deliberate near-black vault.
+   The bay floor is a flat, opaque near-black so the JPG canvas can dissolve
+   into it under a normal blend. On top of that floor sit two faint texture
+   layers (rendered on .identity-core::before so they sit BEHIND the core
+   content but above the opaque floor):
+     - a micro grid at ~1.6% teal (tactical surface, countable, never bright)
+     - a corner vignette that darkens toward the edges (holds the figure,
+       hides the seam where the black vault meets the teal rails)
+   There is NO bright centre glow: a glow behind the head would fight the
+   black canvas and read as "cyan fog over the robot". */
+.identity-core,
+.identity-core > .argus-core {
+  background: #000508 !important;
+}
+/* argus-core fills identity-core exactly (stretch) but stays TRANSPARENT so
+   the bay floor + grid + vignette painted on identity-core::before/::after
+   show through instead of being buried under a flat fill. The opaque floor
+   lives on .identity-core itself. */
+.identity-core > .argus-core {
+  background: transparent !important;
+}
+/* Re-assert the bay layer's geometry (shell.css also paints this pseudo,
+   but this sheet restates it so the whole bay surface is defined HERE). */
+.identity-core:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(120, 220, 230, .016) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 220, 230, .016) 1px, transparent 1px),
+    radial-gradient(ellipse 78% 64% at 50% 46%, transparent 50%, rgba(0, 0, 0, .34) 100%);
+  background-size: 30px 30px, 30px 30px, auto;
+  /* Soften the grid where it nears the rails so the vault bends into the
+     rest of the interface instead of ending in a hard line. */
+  mask-image: radial-gradient(ellipse at 50% 48%, #000 12%, rgba(0, 0, 0, .65) 68%, transparent 100%);
+}
+/* A second, even darker hold right at the rim for the vault lip. */
+.identity-core:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 120px rgba(0, 0, 0, .48);
+}
+/* The cargo sits above both bay layers. */
+.identity-core > .argus-core { z-index: 1; }
+
+/* ---- neutralise the legacy cyan glow that sat behind the head. The black
+   canvas self-absorbs; a coloured center glow only competes with it. ---- */
+.argus-core:before {
+  background: radial-gradient(
+      ellipse 82% 74% at 50% 44%,
+      #03090d 0%,
+      rgba(3, 9, 13, .0) 70%
+    ) !important;
+}
+/* ---- thin structural boundary: keeps the vault reading as an instrument
+   chamber, not a void. Same language as the rails, one notch darker. ---- */
+.argus-core:after {
+  border-inline: 1px solid rgba(120, 220, 230, .07) !important;
+}
+
+/* ============================================================
+   2. THE ROBOT — original JPG, normal blend, face-priority.
+   inline-size 138% lets the full bust overflow the lane (bay is overflow:
+   visible, set in the scroll pass) so the figure dominates 70-80% of the
+   bay — the overflowed canvas is black-on-black and therefore invisible.
+   The ring arcs sit at z-index 2, the robot at z-index 3: rear arcs behind,
+   face never painted over. */
+.core-visual img {
+  z-index: 3 !important;
+  inline-size: 138% !important;
+  block-size: auto !important;
+  max-inline-size: none !important;
+  max-block-size: none !important;
+  object-fit: contain !important;
+  transform-origin: 50% 96% !important;
+  transform: translateY(-2%) !important;
+  /* NORMAL blend: the JPG's own black canvas equals the bay's #000508, so
+     the rectangular edge is invisible WITHOUT any blend trick, and the dark
+     metallic details of the armour render fully opaque (screen blend washed
+     them out). */
+  mix-blend-mode: normal !important;
+  /* No colour fog: contrast + a touch of saturate keep the armour sharp and
+     the eyes bright against the vault; no coloured drop-shadow. */
+  filter: contrast(1.14) saturate(1.04) brightness(1.02) !important;
+  /* Two-axis feather — SAFE single-mask form. One gradient feathers the
+     left/right edge of the JPG rectangle so the vertical seams melt into the
+     bay; a second feathers the existing lower melt. The composite below is
+     pinned explicitly to UNION (add / source-over): shell.css:228 still
+     declares `mask-composite:intersect` / `-webkit-mask-composite:source-in`
+     (a leftover from the old ellipse blanker), and that per-layer keyword is
+     unreliable on WebView2 — in an earlier build it trapped layer one against
+     the empty backdrop and collapsed the whole bust. Because this sheet loads
+     last and every token is !important, the explicit add/union below wins and
+     wherever EITHER gradient is opaque the pixel stays opaque. The head and
+     helmet sit in the fully-opaque centre lane of both gradients, so they stay
+     crisp; only the canvas rim melts. */
+  -webkit-mask-image:
+      linear-gradient(to right, transparent 0%, #000 11%, #000 89%, transparent 100%),
+      linear-gradient(to bottom, #000 0%, #000 86%, rgba(0, 0, 0, .5) 93%, transparent 100%) !important;
+  -webkit-mask-composite: source-over !important;
+  mask-image:
+      linear-gradient(to right, transparent 0%, #000 11%, #000 89%, transparent 100%),
+      linear-gradient(to bottom, #000 0%, #000 86%, rgba(0, 0, 0, .5) 93%, transparent 100%) !important;
+  mask-composite: add !important;
+}
+
+/* Alert variant (red eye): punchier contrast to match the alarm, still no
+   colour fog over the subject. */
+.core-visual img.alert {
+  filter: contrast(1.18) saturate(1.06) brightness(1.04) !important;
+}
+
+/* The visual lane itself is now just open air over the black bay — no fill
+   of its own needed. Drop the old radial backdrop so nothing but the vault
+   sits behind the robot. */
+.core-visual {
+  background: transparent !important;
+}
+
+/* ---- ring-arcs: behind the robot, not in front (no glow across the face) ---- */
+.core-visual .ring-arc {
+  z-index: 2 !important;
+}
+
+/* ---- ring brightness reduced near the face — instrument, not a wash ---- */
+.ring-segment {
+  filter: drop-shadow(0 0 3px color-mix(in srgb,
+      var(--core-color, var(--cyan)) 35%, transparent)) !important;
+}
+.ring-path {
+  filter: drop-shadow(0 0 3px color-mix(in srgb,
+      var(--core-color, var(--cyan)) 32%, transparent)) !important;
+}
+.ring-markers {
+  filter: drop-shadow(0 0 3px color-mix(in srgb,
+      var(--core-color, var(--cyan)) 40%, transparent)) !important;
+}
+/* Inner ring border: lower alpha so it recedes behind the helmet */
+.core-visual .inner-ring {
+  border-color: color-mix(in srgb, var(--core-color, var(--cyan)) 18%, transparent) !important;
+}
+
+/* ---- responsive: compress only the art as the bay gets shorter ---- */
+@media (max-height: 800px) {
+  .core-visual img {
+    inline-size: 132% !important;
+  }
+}
+@media (max-height: 700px) {
+  .core-visual img {
+    inline-size: 126% !important;
+    transform: translateY(-3%) !important;
+  }
+}
+
+/* ============================================================
+   DECORATIVE RECEDE PASS (this sheet loads last, so every rule below
+   beats shell.css / detail.css and re-reads as final authority for the
+   centre of the bay — the figure sits on top at z-index 3; nothing here
+   is allowed to paint over the bust).
+
+   Goal: keep every ring/arc/label/dot (DOM is untouched) but let them
+   recede to a faint tactical backdrop. The tactical-rings SVG strokes
+   were the real brightness culprit — shell.css paints ring-segment /
+   ring-path / ring-markers at full-alpha --core-color with a big glow,
+   and earlier passes here only softened the drop-shadow, never the
+   strokes. So the strokes come down hard, and the arcs stop reading as
+   a frame flanking the bust. */
+.tactical-rings .ring-segment { stroke: color-mix(in srgb, var(--core-color, var(--cyan)) 30%, transparent) !important;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--core-color, var(--cyan)) 14%, transparent)) !important; }
+.tactical-rings .ring-path   { stroke: color-mix(in srgb, var(--core-color, var(--cyan)) 19%, transparent) !important; }
+.tactical-rings .ring-markers{ fill:   color-mix(in srgb, var(--core-color, var(--cyan)) 17%, transparent) !important; }
+.tactical-rings .ring-perimeter { stroke: color-mix(in srgb, var(--core-color, var(--cyan)) 20%, transparent) !important; }
+.tactical-rings .ring-dash   { stroke: color-mix(in srgb, var(--core-color, var(--cyan)) 14%, transparent) !important; }
+.tactical-rings .ring-fine   { stroke: color-mix(in srgb, var(--core-color, var(--cyan)) 9%, transparent) !important; }
+.tactical-rings .ring-inner  { stroke: color-mix(in srgb, var(--core-color, var(--cyan)) 10%, transparent) !important; }
+
+/* micro ticks / labels / indexes / reticle: whispered instrumentation. */
+.ring-micro line       { stroke: color-mix(in srgb, var(--core-color, var(--cyan)) 12%, transparent) !important; }
+.ring-micro line.major { stroke: color-mix(in srgb, var(--core-color, var(--cyan)) 26%, transparent) !important; }
+.ring-micro .divider,
+.ring-micro .ringdot   { stroke-opacity: .35 !important; }
+.ring-label { fill: color-mix(in srgb, var(--cyan-soft) 26%, transparent) !important; }
+.ring-index { fill: color-mix(in srgb, var(--muted) 18%, transparent) !important; opacity: .5 !important; }
+.ring-micro .orbit-dot { fill: var(--cyan-soft) !important; opacity: .35 !important; }
+.reticle    { opacity: .4 !important; }
+
+/* ---- ring arcs: repositioned to the rim + heavily feathered so they read
+   as faint orbit strokes near the vault edge, never frames the bust. The
+   base rules (shell.css / core-lanes.css) place arcs a/b close in and at
+   full alpha; these move them outward and cut the paint. Still behind the
+   robot (z-index 2 from the base). */
+.ring-arc  { opacity: .10 !important; }
+.ring-arc-a,
+.ring-arc-b { opacity: .14 !important; }
+.ring-arc-a {
+  inset: 11% !important;
+  transform: rotate(18deg) !important;
+  border-top-color: color-mix(in srgb, var(--core-color, var(--cyan)) 42%, transparent) !important;
+}
+.ring-arc-b {
+  inset: 19% !important;
+  transform: rotate(-96deg) !important;
+  border-top-color: color-mix(in srgb, var(--core-color, var(--cyan)) 8%, transparent) !important;
+}
+.ring-arc-a:before,
+.ring-arc-a:after { opacity: .12 !important; }
+.ring-arc-b:before,
+.ring-arc-b:after { opacity: .1 !important; }
+
+/* ---- outer/middle/inner rings: the only rung left in view reads as a
+   faint instrument, only the far edges visible behind the helmet. ---- */
+.ring-perimeter { stroke: color-mix(in srgb, var(--core-color, var(--cyan)) 22%, transparent) !important; }
+.outer-ring { border-color: color-mix(in srgb, var(--core-color, var(--cyan)) 40%, transparent) !important;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--core-color, var(--cyan)) 8750%, transparent) !important; }
+.outer-ring i { opacity: .22 !important; }
+.middle-ring { border-color: color-mix(in srgb, var(--core-color, var(--cyan)) 33%, transparent) !important;
+  box-shadow: inset 0 0 18px color-mix(in srgb, var(--core-color, var(--cyan)) 10%, transparent) !important; }
+.inner-ring  { border-color: color-mix(in srgb, var(--core-color, var(--cyan)) 30%, transparent) !important;
+  box-shadow: inset 0 0 14px color-mix(in srgb, var(--core-color, var(--cyan)) 5%, transparent) !important; }
+.ring-rays { opacity: .5 !important; }
+.core-ambient { opacity: .3 !important; }
+.core-ambient i { opacity: .22 !important; }

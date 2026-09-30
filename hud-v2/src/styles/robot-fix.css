@@ -1,0 +1,56 @@
+/* ARGUS HUD V2 — robot face restoration (loaded LAST, see main.ts).
+   Focused repair of the core hero ONLY. The transparent asset is a
+   conservative, RGB-identical cutout (tools produced core-idle.png /
+   core-alert.png: only edge-connected near-black removed, interior dark metal
+   and the whole face preserved). This sheet owns the robot's SIZE, LAYER and
+   BACKDROP so the face reads as the hero:
+
+     grid / ambient  →  rear rings (z2)  →  dark head backdrop (z3)  →
+     ROBOT (z6)  →  [text lanes live BELOW the visual, never over it]
+
+   No mask covers the robot face; the centre stays 100% opaque. */
+
+/* Scale the whole core visual up — the robot is the hero. */
+.identity-core .core-visual{
+  max-inline-size:min(100%,720px)!important;
+  align-self:end!important;
+  overflow:visible!important;
+}
+
+/* Dark radial backdrop behind the HEAD: painted over the rear rings (z3) but
+   under the robot (z6), so it separates the helmet from the ring lattice
+   without ever sitting on top of the robot. */
+.identity-core .core-visual::before{
+  content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:radial-gradient(40% 36% at 50% 39%,
+    rgba(2,9,12,.94), rgba(2,9,12,.6) 48%, rgba(2,9,12,.18) 66%, transparent 78%);
+}
+
+/* Robot: larger, head not cropped, crisp, ABOVE the rings. */
+.identity-core .core-visual img{
+  inline-size:118%!important;
+  block-size:auto!important;
+  max-block-size:none!important;
+  object-fit:contain!important;
+  transform:translateY(-1.5%)!important;
+  position:relative!important;
+  z-index:6!important;
+}
+/* The real alpha cutout: normal composite, NO mask over the face, only a
+   restrained contrast/brightness lift and a soft grounding shadow — no bloom,
+   no cyan wash, no heavy blur. */
+.identity-core .core-visual img.alpha{
+  -webkit-mask-image:none!important;mask-image:none!important;
+  mix-blend-mode:normal!important;
+  filter:contrast(1.06) saturate(.94) brightness(1.05)
+    drop-shadow(0 8px 20px rgba(0,0,0,.5))!important;
+}
+/* Fallback JPG (asset missing): keep the screen-blend so its black never
+   shows, but it is the degraded path — the alpha PNG above is the real one. */
+
+/* Rear rings sit BEHIND the robot; dim the brightest foreground arcs a touch
+   so no ring line cuts across the face. The ambient cyan glow stays behind. */
+.identity-core .core-visual .ring-arc,
+.identity-core .core-visual .ring-segment{opacity:.72}
+.identity-core .core-visual .halo{z-index:0!important}
+.identity-core .core-visual .ring-rays{opacity:.62}

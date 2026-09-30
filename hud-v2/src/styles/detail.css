@@ -1,0 +1,173 @@
+/* ARGUS HUD V2 -- Freebuff visual detail pass.
+   Loaded last (after ux.css) so these rules win the cascade without touching
+   shell.css/ux.css, which other sessions iterate on. Everything here is
+   presentation: no new data sources, no fabricated telemetry, no layout
+   shifts outside the slots this pass adds. Decorative layers are
+   pointer-events:none and sit behind content. */
+
+/* ============================================================
+   MICRO NAVIGATION (reference strip, secondary to primary nav)
+   OBSERVE -> logs page, ANALYZE -> agents page, PROTECT -> security page,
+   ASSIST -> real Ctrl+Space handler that focuses the command console.
+   Lives INSIDE the brand block: adds zero header rows.
+   ============================================================ */
+.micro-nav{display:inline-flex;align-items:center;gap:5px;font:700 9px var(--mono);letter-spacing:.16em;color:var(--muted);white-space:nowrap}
+.micro-nav button{border:0;background:none;padding:0;font:inherit;letter-spacing:inherit;color:var(--muted);cursor:pointer;transition:color 140ms ease}
+.micro-nav button:hover,.micro-nav button:focus-visible{color:var(--cyan-soft);outline:none;text-shadow:0 0 8px color-mix(in srgb,var(--cyan) 45%,transparent)}
+.micro-nav button.active{color:var(--cyan);text-shadow:0 0 9px color-mix(in srgb,var(--cyan) 55%,transparent)}
+/* Micro-nav separators are now SVG chevrons (.micro-chev, icons.css). */
+
+/* ============================================================
+   NETWORK GLOBE -- added ring, halo, gateway node, external nodes,
+   activity pulse (fires only when a real timeline event lands).
+   ============================================================ */
+.globe-halo{fill:none;stroke:color-mix(in srgb,var(--cyan) 14%,transparent);stroke-width:.5}
+.globe-outer{fill:none;stroke:color-mix(in srgb,var(--cyan) 22%,transparent);stroke-width:.5;stroke-dasharray:1 3}
+.globe-nodes .globe-ext{fill:color-mix(in srgb,var(--cyan-soft) 80%,transparent);opacity:.75}
+.globe-gateway .gateway-core{fill:var(--cyan);filter:drop-shadow(0 0 3px var(--cyan))}
+.globe-gateway .gateway-ring{fill:none;stroke:color-mix(in srgb,var(--cyan) 70%,transparent);stroke-width:.5}
+.globe-pulse circle{fill:none;stroke:var(--cyan-soft);stroke-width:.7;opacity:0;animation:node-ping 1.5s ease-out 1}
+@keyframes node-ping{0%{opacity:.85;transform:scale(.4);transform-origin:-2px 2px}100%{opacity:0;transform:scale(2.6);transform-origin:-2px 2px}}
+
+/* ============================================================
+   CORE MICRODETAIL -- micro-ticks, dividers, dotted inner ring,
+   orbit dots, ring labels, sector indexes, reticle, connectors.
+   All decorative structure: pointer-events none, behind the robot.
+   ============================================================ */
+.ring-micro line{stroke:color-mix(in srgb,var(--core-color,var(--cyan)) 26%,transparent);stroke-width:.7;vector-effect:non-scaling-stroke}
+.ring-micro line.major{stroke:color-mix(in srgb,var(--core-color,var(--cyan)) 62%,transparent);stroke-width:1.4}
+.ring-micro .divider{stroke:color-mix(in srgb,var(--core-color,var(--cyan)) 12%,transparent);stroke-width:.6;stroke-dasharray:1 5}
+.ring-micro .dot-inner{fill:none;stroke:color-mix(in srgb,var(--core-color,var(--cyan)) 30%,transparent);stroke-width:.8;stroke-dasharray:.5 5}
+.ring-micro .orbit-dot{fill:var(--cyan-soft);filter:drop-shadow(0 0 3px var(--cyan));transform-origin:300px 300px;animation:orbit-drift 26s linear infinite;animation-delay:calc(var(--phase,0deg) / -15.65deg * 1s)}
+@keyframes orbit-drift{to{transform:rotate(360deg)}}
+.ring-label{font:700 8.5px var(--mono);letter-spacing:.22em;fill:color-mix(in srgb,var(--cyan-soft) 62%,transparent);text-anchor:middle;dominant-baseline:middle}
+.ring-index{font:700 6.5px var(--mono);letter-spacing:.14em;fill:color-mix(in srgb,var(--muted) 80%,transparent);text-anchor:middle;dominant-baseline:middle;opacity:.75}
+.reticle{stroke:color-mix(in srgb,var(--core-color,var(--cyan)) 22%,transparent);stroke-width:.8;fill:none}
+.reticle .reticle-dot{fill:color-mix(in srgb,var(--core-color,var(--cyan)) 40%,transparent);stroke:none}
+.argus-core.state-error .reticle,.argus-core.state-lockdown .reticle{stroke:color-mix(in srgb,var(--red) 30%,transparent)}
+.argus-core.state-error .reticle .reticle-dot,.argus-core.state-lockdown .reticle .reticle-dot{fill:color-mix(in srgb,var(--red) 50%,transparent)}
+
+/* Ambient depth behind the core: micro-grid + slow particles. Behind the
+   image (z-index 2 < img 3/4), pointer-events none. */
+.core-ambient{position:absolute;inset:4%;border-radius:50%;z-index:2;pointer-events:none;background-image:linear-gradient(rgba(0,234,242,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,234,242,.05) 1px,transparent 1px);background-size:22px 22px;-webkit-mask:radial-gradient(circle,#000 30%,transparent 72%);mask:radial-gradient(circle,#000 30%,transparent 72%);opacity:.5}
+.core-ambient i{position:absolute;width:2px;height:2px;border-radius:50%;background:var(--cyan-soft);opacity:0;animation:ambient-drift var(--dur,14s) linear infinite;animation-delay:var(--delay,0s)}
+.core-ambient i:nth-child(4n+1){left:12%;top:38%}
+.core-ambient i:nth-child(4n+2){left:30%;top:16%;--dur:18s;--delay:-6s}
+.core-ambient i:nth-child(4n+3){left:66%;top:22%;--dur:12s;--delay:-3s}
+.core-ambient i:nth-child(4n+0){left:84%;top:44%;--dur:16s;--delay:-9s}
+.core-ambient i:nth-child(5n+1){left:20%;top:70%;--dur:20s;--delay:-12s}
+.core-ambient i:nth-child(5n+2){left:48%;top:82%;--dur:13s;--delay:-5s}
+.core-ambient i:nth-child(5n+3){left:74%;top:74%;--dur:17s;--delay:-15s}
+.core-ambient i:nth-child(5n+4){left:8%;top:56%;--dur:15s;--delay:-2s}
+.core-ambient i:nth-child(5n+0){left:90%;top:64%;--dur:19s;--delay:-8s}
+@keyframes ambient-drift{0%{opacity:0;transform:translate(0,0)}12%{opacity:.5}82%{opacity:.35}100%{opacity:0;transform:translate(6px,-14px)}}
+
+/* Thin connector traces: core -> state ladder / security ladder / waveform.
+   1px, very low opacity, no text crossings (they stop at the rail edges). */
+.ladder-connectors{position:absolute;inset:0;pointer-events:none;z-index:0}
+.ladder-connectors i{position:absolute;background:linear-gradient(90deg,color-mix(in srgb,var(--core-color,var(--cyan)) 18%,transparent),transparent);height:1px}
+.ladder-connectors .lc-left{left:7.5%;top:38%;width:11%;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--core-color,var(--cyan)) 16%,transparent))}
+.ladder-connectors .lc-right{right:7.5%;top:38%;width:11%;background:linear-gradient(90deg,color-mix(in srgb,var(--core-color,var(--cyan)) 16%,transparent),transparent)}
+.ladder-connectors .lc-bottom{left:30%;right:30%;bottom:14.5%;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--core-color,var(--cyan)) 14%,transparent),transparent)}
+
+/* ============================================================
+   EVENT TIMELINE -- filter tabs + honest LIVE chip.
+   ============================================================ */
+.tl-live{font:700 9px var(--mono);letter-spacing:.1em;color:var(--muted)}
+.tl-live i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--muted);margin-right:5px;vertical-align:1px}
+.tl-live.on{color:var(--green)}
+.tl-live.on i{background:var(--green);box-shadow:0 0 7px var(--green);animation:live-pulse 2.2s ease-in-out infinite}
+@keyframes live-pulse{50%{box-shadow:0 0 12px var(--green)}}
+.tl-tabs{display:flex;gap:4px;margin:0 0 7px}
+.tl-tabs button{border:1px solid var(--line-soft);background:rgba(2,9,12,.3);color:var(--muted);font:700 8px var(--mono);letter-spacing:.1em;padding:2px 8px;cursor:pointer;border-radius:2px;transition:color 140ms ease,border-color 140ms ease,background 140ms ease}
+.tl-tabs button:hover{color:var(--cyan-soft);border-color:var(--line)}
+.tl-tabs button.active{color:var(--cyan);border-color:var(--cyan);background:rgba(0,234,242,.07);text-shadow:0 0 8px color-mix(in srgb,var(--cyan) 40%,transparent)}
+.chip-security{color:var(--red)}
+.chip-agent{color:var(--cyan-soft)}
+.chip-system,.chip-model,.chip-verify{color:var(--secondary)}
+.chip-policy,.chip-auth{color:var(--amber)}
+.chip-detect,.chip-error{color:var(--red)}
+.chip-execute{color:var(--green)}
+
+/* ============================================================
+   THREAT MONITOR -- real severity counts row.
+   ============================================================ */
+.threat-counts{display:flex;flex-wrap:wrap;gap:8px 16px;margin:2px 0 9px;padding:8px 0;border-bottom:1px solid var(--line-soft)}
+.threat-counts .sev{font:600 11px var(--font-data);letter-spacing:.08em;color:var(--secondary)}
+.threat-counts .sev b{font:700 12px/1.1 var(--font-data);color:inherit}
+.threat-counts .sev-critical b{color:var(--red)}
+.threat-counts .sev-high b{color:var(--amber)}
+.threat-counts .sev-medium b{color:var(--amber)}
+.threat-counts .sev-low b{color:var(--green)}
+.panel.threat{display:grid;grid-template-rows:auto auto minmax(180px,1fr) auto;gap:12px;min-width:0;overflow:visible}
+.panel.threat .trend{display:grid;grid-template-rows:60px minmax(120px,1fr);gap:6px;position:relative;min-height:180px;align-content:start}
+.trend-grid{position:relative;display:flex;align-items:flex-end;gap:2px;height:100%;opacity:.6;padding:4px 0}
+.trend-grid i{flex:1;min-width:1px;height:calc(var(--tick,3) * 3px);background:linear-gradient(to top,color-mix(in srgb,var(--cyan) 60%,transparent),rgba(101,247,255,.08));border-top:1px solid var(--cyan-soft)}
+.panel.threat .trend>span,.panel.threat .trend>b{position:relative;z-index:2;font-size:10px;color:var(--muted);font:600 10px var(--font-data);letter-spacing:.06em}
+.panel.threat .recent{min-height:0;display:grid;gap:6px}
+.panel.threat .recent h3{font-size:11px;color:var(--secondary);font:700 11px var(--font-data);letter-spacing:.08em;margin:0}
+.panel.threat .alert-list{display:grid;gap:5px;max-height:120px;overflow:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+
+/* ============================================================
+   QUICK ACTIONS -- reference 3x2 tile grid + icon + hover.
+   ============================================================ */
+.quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:38px;gap:7px;margin-top:10px}
+.quick-grid button{position:relative;border:1px solid var(--line);border-radius:3px;background:#0a181d;color:var(--secondary);height:40px;font:600 10px "Segoe UI",sans-serif;text-align:left;padding:8px 10px;cursor:pointer;overflow:visible;transition:border-color 140ms ease,background 140ms ease}
+.quick-grid button:before{content:"";position:absolute;left:0;top:0;width:16px;height:2px;background:var(--cyan);opacity:.65;transition:width 160ms ease}
+.quick-grid button:hover:not(:disabled),.quick-grid button:focus-visible{border-color:color-mix(in srgb,var(--cyan) 70%,transparent);background:#0d2026;outline:none}
+.quick-grid button:hover:not(:disabled):before{width:30px}
+.quick-grid button:disabled{cursor:not-allowed;opacity:.55}
+.quick-grid button i{margin-right:8px;font-style:normal;display:inline-flex;align-items:center}
+.quick-grid button i svg{display:block}
+.quick>div:not(.quick-grid){display:none}
+
+/* ============================================================
+   SECURITY ICONS -- small semantic icon on every status row and a
+   large semantic shield in the summary card (Phosphor).
+   ============================================================ */
+.security-row .row-label{display:inline-flex;align-items:center;gap:6px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.shield-lg{width:34px;height:34px;flex:0 0 auto;color:var(--green)}
+.security-summary.critical .shield-lg{color:var(--red)}
+.security-summary.unknown .shield-lg{color:var(--amber)}
+
+/* ============================================================
+   PANEL SCI-FI DETAIL -- corner cut on dashboard panels, 4px state
+   dots on panel titles, divider under panel titles. Restrained.
+   ============================================================ */
+.dashboard-page .panel{border-radius:0;clip-path:polygon(0 9px,9px 0,calc(100% - 9px) 0,100% 9px,100% calc(100% - 9px),calc(100% - 9px) 100%,9px 100%,0 calc(100% - 9px))}
+.panel-title{position:relative;padding-bottom:7px;border-bottom:1px solid rgba(223,251,255,.06)}
+.dashboard-page .panel-title:after{content:"";position:absolute;left:0;bottom:-1px;width:22px;height:1px;background:linear-gradient(90deg,var(--cyan),transparent)}
+.dashboard-page .panel-title h2:before{content:"";display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);margin-right:7px;vertical-align:2px}
+.dashboard-page .system h2:before{background:var(--cyan)}
+.dashboard-page .processes h2:before{background:var(--amber)}
+.dashboard-page .local-ai h2:before{background:var(--green)}
+.dashboard-page .network h2:before{background:var(--cyan-soft)}
+.dashboard-page .security h2:before{background:var(--green)}
+.dashboard-page .threat h2:before{background:var(--amber)}
+
+/* ============================================================
+   HOVER / INTERACTION -- border brightness + accent movement only.
+   ============================================================ */
+.event-list button{transition:background 140ms ease,border-color 140ms ease;border:1px solid transparent}
+.event-list button:hover:not(:disabled){background:rgba(0,234,242,.05);border-color:var(--line-soft)}
+.security-row{transition:background 140ms ease}
+.security-row:hover{background:rgba(0,234,242,.03)}
+.rail-kv{transition:background 140ms ease}
+.rail-kv:hover{background:rgba(0,234,242,.025)}
+
+/* ============================================================
+   OVERLAP GUARDS -- labels must never collide with the robot or
+   the ladders; connectors never cross text; everything decorative
+   is pointer-events none.
+   ============================================================ */
+.tactical-rings .ring-micro{pointer-events:none}
+.ring-label{pointer-events:none}
+.ring-index{pointer-events:none}
+.ladder-connectors{display:none}
+
+
+@media(prefers-reduced-motion:reduce){
+  .globe-pulse circle,.core-ambient i,.ring-micro .orbit-dot,.tl-live.on i{animation:none!important}
+  .globe-pulse circle{opacity:0}
+  .core-ambient i{opacity:.25}
+}

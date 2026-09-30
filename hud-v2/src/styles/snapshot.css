@@ -1,0 +1,14 @@
+.trend span { font:700 10px var(--mono); letter-spacing:.06em; color:var(--muted); }
+.security-row b { max-width:58%; overflow-x:auto; text-overflow:ellipsis; white-space:nowrap; text-align:right; }
+.security-freshness { margin:-3px 0 7px; font:700 9px var(--mono); letter-spacing:.08em; color:var(--muted); }
+.security.critical { border-color:rgba(255,62,92,.55); background:linear-gradient(135deg,rgba(45,12,20,.94),rgba(12,18,21,.92)); }
+.security.critical:before { border-color:var(--red); }
+.security-decision { margin-top:10px; padding-top:8px; border-top:1px solid var(--line-soft); display:grid; gap:5px; }
+.security-decision h3,.recent h3 { font:700 10px var(--mono); letter-spacing:.08em; color:var(--cyan-soft); }
+.security-decision div { display:flex; justify-content:space-between; gap:10px; font:700 10px var(--mono); }.security-decision span { color:var(--secondary); }.security-decision b { color:var(--amber); text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.security-summary.critical { border-color:rgba(255,62,92,.36); }.security-summary.critical > span,.security-summary.critical b { color:var(--red); }
+.threat .trend { display:flex; justify-content:space-between; align-items:center; }.threat .trend b { color:var(--secondary); font:700 9px var(--mono); letter-spacing:.05em; }
+.alert-list { display:grid; gap:5px; margin-top:8px; max-height:70px; overflow:auto; scrollbar-width:thin; scrollbar-color:var(--line) transparent; }.alert-list div { display:grid; grid-template-columns:58px minmax(0,1fr); gap:6px; font:700 10px var(--mono); color:var(--secondary); }.alert-list b { color:var(--amber); }.alert-list .severity-critical b,.alert-list .severity-high b { color:var(--red); }.alert-list span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }.alert-list time { display:none; }
+.event-list div { animation:event-enter 220ms ease-out both; }.event-list div.warning b { color:var(--amber); }.event-list div.critical b { color:var(--red); }
+@keyframes event-enter { from { opacity:0; transform:translateY(-3px); } to { opacity:1; transform:translateY(0); } }
+@media (prefers-reduced-motion:reduce) { .event-list div { animation:none; } }

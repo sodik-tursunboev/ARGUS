@@ -1,0 +1,5 @@
+/* Phase 2 compact desktop fit: retain the mission and command band at the
+   required 1600×900 target. Rail details scroll locally at shorter heights. */
+.process-values span, .core-meta, .event-list b, footer { font-size: 10px; }
+
+

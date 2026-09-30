@@ -1,0 +1,41 @@
+# ARGUS - pinned direct dependencies.
+#
+# requirements.txt lists what ARGUS needs; this file records the versions this
+# install was built and tested against. Every entry in requirements.txt was
+# unpinned, which means two installs from the same source can differ in every
+# library, and a compromised release of any of them arrives silently on the
+# next `pip install`.
+#
+# Regenerate deliberately, after testing an upgrade:
+#     python tools/lock_deps.py
+#
+# Verify what is installed against it:
+#     python -c "import plugins; print(plugins.check_dependencies())"
+#
+# Direct dependencies only. The full transitive set is 87 packages; pinning
+# those belongs in a proper lock (pip-tools / uv) rather than a hand-kept
+# file that would go stale and be trusted anyway.
+
+fastapi==0.141.1
+uvicorn==0.52.4
+requests==2.33.0
+pydantic==2.13.4
+faster-whisper==1.2.1
+piper-tts==1.7.0
+openwakeword==0.6.0
+sounddevice==0.5.6
+numpy==2.5.2
+pywebview==6.2.1
+psutil==7.2.2
+pygetwindow==0.0.9
+ddgs==9.16.0
+plyer==2.1.0
+pyperclip==1.11.0
+pycaw==20251023
+comtypes==1.4.16
+Pillow==12.3.0
+opencv-python==4.14.0.94
+keyboard==0.13.5
+yt-dlp==2026.8.19
+pyinstaller==6.15.0
+pywin32==312

@@ -1,0 +1,172 @@
+/* ARGUS HUD V2 — core lanes (physical-region rebuild).
+   Loaded after core-readability.css (see main.ts).
+
+   ROOT CAUSE
+   ----------
+   The center previously stacked independent position:absolute strings over
+   the robot square (agent state at bottom:2-16%, waveform at ~9%, sentence
+   at 5.5%, status band at 2%). Because the alpha PNG is opaque across the
+   whole subject, every one of those labels painted over the robot's torso.
+
+   FIX (structural, not positional nudging)
+   ----------------------------------------
+   The core is now one grid with PHYSICAL lanes — nothing may float over the
+   robot:
+
+       grid columns : [ state-ladder | robot-visual ]
+       grid rows    : [ core-top | robot-visual | core-text ]
+
+   .core-visual  = graphics ONLY (robot + rings + ticks + arcs + reticle +
+                     tiny decorative rim indices). No operational text.
+   .core-text    = stacked lane BELOW the artwork: ARGUS // CORE / state /
+                     capability (Zone A), waveform + one sentence (Zone B),
+                     status strip MISSION|VOICE|LOCAL|LINK (Zone C).
+   .state-ladder = its own grid column to the LEFT of the ring — never on top.
+
+   Overrides carry !important because the abandoned absolute rules live in
+   shell.css / ux.css / core-readability.css and must all yield. */
+
+/* ---- the lane grid ---- */
+/* Single-track grid so the robot-visible lane centres on the BAY centre.
+   The old `auto minmax(0,1fr)` put the state ladder ahead of the visual
+   lane, pushing the lane's centre off the bay's and leaving the bust
+   visibly off-centre. The ladder now floats at the left rim (rule below)
+   instead of owning a grid column. */
+.identity-core > .argus-core {
+  grid-template-columns: 1fr !important;
+  grid-template-rows: 16px minmax(0, 1fr) auto !important;
+}
+.core-top {
+  grid-column: 1 !important;
+  grid-row: 1;
+  justify-self: stretch !important;
+  width: 100% !important;
+}
+.state-ladder { grid-column: 1; grid-row: 2; }
+.core-visual  { grid-column: 1; grid-row: 2; }
+.core-text    { grid-column: 1 !important; grid-row: 3; }
+
+/* ---- robot visual: graphics only, centred on the lane ---- */
+.core-visual {
+  margin: 0 !important;
+  /* EXPLICIT box. shell.css leaves inline-size:auto + justify-self:center,
+     and a grid item shrinks to its in-flow content — the only in-flow child
+     here is the <img> at a percentage width, so the box collapses toward the
+     image's intrinsic size (ring becomes a dot in the middle). Pinning the
+     width keeps the ring and robot at full size; height follows via the
+     aspect-ratio square, and inline-size:138% on the img resolves against
+     this definite width. */
+  inline-size: min(100%, 560px) !important;
+  max-inline-size: min(100%, 560px) !important;
+  block-size: auto !important;   /* shell leaves block-size:100%; let the
+                                    aspect-ratio square size it and centre */
+  justify-self: center !important;
+  align-self: center !important;
+}
+/* Robot SIZE / FILTER / BLEND / MASK now live in core-robot.css (loaded
+   after this sheet) — the single authority for image rendering. Kept here:
+   the visual lane stays a physical grid region; nothing crosses into the
+   .core-text row below. See HUD_V2_ROBOT_FACE_RESTORATION.md. */
+
+/* ---- state ladder: pinned to the left rim of the bay, vertically centred.
+   No longer a grid column (see grid above), so it can never shove the bust
+   off the bay centre. The figure sits centred in a ~560px lane inside a much
+   wider bay, so the ~90px ladder at the rim can't overlap it. ---- */
+.state-ladder {
+  position: absolute !important;
+  top: 50% !important;
+  left: 8px !important;
+  right: auto !important;
+  transform: translateY(-50%) !important;
+  justify-self: center !important;
+  align-self: center !important;
+  gap: 16px !important;
+  padding-left: 6px;
+}
+.state-ladder i {
+  width: 7px !important;
+  height: 7px !important;
+}
+
+/* ---- core-text: one stacked lane, physically below the artwork ---- */
+.core-text {
+  display: grid !important;
+  justify-self: stretch !important;
+  justify-items: center !important;
+  text-align: center !important;
+  gap: 10px !important;
+  padding: 12px 3% 2px !important;
+  min-width: 0;
+}
+/* All four former absolute strings become static, in-flow lane children. */
+.agent-state,
+.voice-waveform,
+.core-status-line,
+.core-status-band {
+  position: static !important;
+  transform: none !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+  grid-row: auto !important;
+  width: auto !important;
+  margin: 0 !important;
+}
+
+/* ---- Zone A — hero stack ---- */
+/* The robot bust overflows the visual lane and its lower torso now sits
+   behind this stack, so the state word is sized and shadowed to hold its own
+   over the artwork — the image itself is NOT shrunk to accommodate it. */
+.agent-state { min-height: 0 !important; }
+.agent-state span { font-size: 13px !important; letter-spacing: .22em !important;
+  text-shadow: 0 1px 8px rgba(0,0,0,.9) !important; }
+.agent-state h1 { font-size: 44px !important; font-weight: 800 !important;
+  letter-spacing: .10em !important;
+  text-shadow: 0 0 16px rgba(0,0,0,.95), 0 2px 6px rgba(0,0,0,.95) !important; }
+.agent-state p  { font-size: 14px !important; letter-spacing: .06em !important;
+  text-shadow: 0 1px 8px rgba(0,0,0,.9) !important; }
+
+/* ---- Zone B — waveform lane (its own horizontal band) ---- */
+.voice-waveform { width: 62% !important; height: auto !important; }
+/* The situation sentence is OPERATIONAL (spec Core Bay §7/§12): one clear
+   sentence from real state, so it holds the 13px bar. Loaded after
+   core-readability.css (which floored it at 12px), this wins the cascade. */
+.core-status-line { margin-top: -4px !important; font-size: 13px !important; }
+.core-status-line:empty { display: none !important; }
+
+/* ---- Zone C — one slim inline status strip with pipe separators ---- */
+.core-status-band {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  font: 600 13px/1 var(--font-data) !important;
+  letter-spacing: .08em !important;
+  color: var(--muted) !important;
+  text-shadow: 0 1px 6px rgba(0,0,0,.85);
+  white-space: nowrap !important;
+  padding: 6px 12px !important;
+  border-top: 1px solid var(--line-soft) !important;
+}
+.core-status-band span + span {
+  border-left: 1px solid var(--line) !important;
+  padding-left: 12px !important;
+}
+.core-status-band b { font-weight: 700 !important; color: var(--text) !important; }
+.core-status-band b.ok  { color: var(--green) !important; }
+.core-status-band b.warn { color: var(--amber) !important; }
+.core-status-band b.bad { color: var(--red) !important; }
+
+/* ---- responsive: compress lanes' padding/gaps only, never text ---- */
+@media (max-height: 800px) {
+  .core-text { gap: 7px !important; padding-top: 8px !important; }
+  .agent-state h1 { font-size: 26px !important; }
+  .core-status-band { gap: 9px !important; padding: 4px 10px !important; }
+}
+@media (max-height: 700px) {
+  .core-text { gap: 5px !important; padding-top: 6px !important; }
+  .agent-state h1 { font-size: 23px !important; }
+  .core-status-band { gap: 8px !important; padding: 3px 8px !important; }
+  .state-ladder { gap: 12px !important; }
+}

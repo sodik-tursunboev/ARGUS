@@ -1,0 +1,326 @@
+{
+  "assets": [
+    {
+      "bytes": 532540,
+      "family": "academic",
+      "file": "buildings/academy.glb",
+      "kind": "operational",
+      "name": "academy",
+      "objects": 10,
+      "triangles": 9612
+    },
+    {
+      "bytes": 498692,
+      "family": "corporate",
+      "file": "buildings/agent_hq.glb",
+      "kind": "operational",
+      "name": "agent_hq",
+      "objects": 8,
+      "triangles": 8924
+    },
+    {
+      "bytes": 165068,
+      "family": "industrial",
+      "file": "buildings/capability_center.glb",
+      "kind": "operational",
+      "name": "capability_center",
+      "objects": 8,
+      "triangles": 2888
+    },
+    {
+      "bytes": 91284,
+      "family": "cloud",
+      "file": "buildings/cloud_embassy.glb",
+      "kind": "operational",
+      "name": "cloud_embassy",
+      "objects": 8,
+      "triangles": 1604
+    },
+    {
+      "bytes": 408804,
+      "family": "corporate",
+      "file": "buildings/core_tower.glb",
+      "kind": "operational",
+      "name": "core_tower",
+      "objects": 9,
+      "triangles": 7288
+    },
+    {
+      "bytes": 50600,
+      "family": "industrial",
+      "file": "buildings/data_vault.glb",
+      "kind": "operational",
+      "name": "data_vault",
+      "objects": 7,
+      "triangles": 812
+    },
+    {
+      "bytes": 92532,
+      "family": "hardened",
+      "file": "buildings/forensics_center.glb",
+      "kind": "operational",
+      "name": "forensics_center",
+      "objects": 8,
+      "triangles": 1524
+    },
+    {
+      "bytes": 131936,
+      "family": "academic",
+      "file": "buildings/lab_block_a.glb",
+      "kind": "operational",
+      "name": "lab_block_a",
+      "objects": 9,
+      "triangles": 2264
+    },
+    {
+      "bytes": 150260,
+      "family": "academic",
+      "file": "buildings/lab_block_b.glb",
+      "kind": "operational",
+      "name": "lab_block_b",
+      "objects": 9,
+      "triangles": 2608
+    },
+    {
+      "bytes": 218476,
+      "family": "industrial",
+      "file": "buildings/model_compute.glb",
+      "kind": "operational",
+      "name": "model_compute",
+      "objects": 8,
+      "triangles": 3952
+    },
+    {
+      "bytes": 234792,
+      "family": "utility",
+      "file": "buildings/office_block_a.glb",
+      "kind": "scenery",
+      "name": "office_block_a",
+      "objects": 8,
+      "triangles": 4172
+    },
+    {
+      "bytes": 279720,
+      "family": "utility",
+      "file": "buildings/office_block_b.glb",
+      "kind": "scenery",
+      "name": "office_block_b",
+      "objects": 8,
+      "triangles": 4984
+    },
+    {
+      "bytes": 157248,
+      "family": "utility",
+      "file": "buildings/office_block_c.glb",
+      "kind": "scenery",
+      "name": "office_block_c",
+      "objects": 8,
+      "triangles": 2720
+    },
+    {
+      "bytes": 300396,
+      "family": "utility",
+      "file": "buildings/office_block_d.glb",
+      "kind": "scenery",
+      "name": "office_block_d",
+      "objects": 8,
+      "triangles": 5360
+    },
+    {
+      "bytes": 190404,
+      "family": "utility",
+      "file": "buildings/office_block_e.glb",
+      "kind": "scenery",
+      "name": "office_block_e",
+      "objects": 8,
+      "triangles": 3336
+    },
+    {
+      "bytes": 128812,
+      "family": "hardened",
+      "file": "buildings/operations_center.glb",
+      "kind": "operational",
+      "name": "operations_center",
+      "objects": 8,
+      "triangles": 2180
+    },
+    {
+      "bytes": 114952,
+      "family": "civic",
+      "file": "buildings/policy_gate.glb",
+      "kind": "operational",
+      "name": "policy_gate",
+      "objects": 8,
+      "triangles": 1912
+    },
+    {
+      "bytes": 127916,
+      "family": "academic",
+      "file": "buildings/research_annex.glb",
+      "kind": "operational",
+      "name": "research_annex",
+      "objects": 8,
+      "triangles": 2196
+    },
+    {
+      "bytes": 170716,
+      "family": "residential",
+      "file": "buildings/residential_a.glb",
+      "kind": "scenery",
+      "name": "residential_a",
+      "objects": 10,
+      "triangles": 2920
+    },
+    {
+      "bytes": 195224,
+      "family": "residential",
+      "file": "buildings/residential_b.glb",
+      "kind": "scenery",
+      "name": "residential_b",
+      "objects": 10,
+      "triangles": 3360
+    },
+    {
+      "bytes": 156604,
+      "family": "residential",
+      "file": "buildings/residential_c.glb",
+      "kind": "scenery",
+      "name": "residential_c",
+      "objects": 9,
+      "triangles": 2688
+    },
+    {
+      "bytes": 257412,
+      "family": "residential",
+      "file": "buildings/residential_tower.glb",
+      "kind": "scenery",
+      "name": "residential_tower",
+      "objects": 10,
+      "triangles": 4488
+    },
+    {
+      "bytes": 81772,
+      "family": "hardened",
+      "file": "buildings/response_center.glb",
+      "kind": "operational",
+      "name": "response_center",
+      "objects": 8,
+      "triangles": 1324
+    },
+    {
+      "bytes": 159012,
+      "family": "hardened",
+      "file": "buildings/security_command.glb",
+      "kind": "operational",
+      "name": "security_command",
+      "objects": 10,
+      "triangles": 2708
+    },
+    {
+      "bytes": 32232,
+      "family": "utility",
+      "file": "buildings/shop_cafe.glb",
+      "kind": "scenery",
+      "name": "shop_cafe",
+      "objects": 6,
+      "triangles": 472
+    },
+    {
+      "bytes": 50348,
+      "family": "utility",
+      "file": "buildings/shop_charging.glb",
+      "kind": "scenery",
+      "name": "shop_charging",
+      "objects": 7,
+      "triangles": 780
+    },
+    {
+      "bytes": 24360,
+      "family": "utility",
+      "file": "buildings/shop_maintenance.glb",
+      "kind": "scenery",
+      "name": "shop_maintenance",
+      "objects": 6,
+      "triangles": 332
+    },
+    {
+      "bytes": 57472,
+      "family": "utility",
+      "file": "buildings/shop_parts.glb",
+      "kind": "scenery",
+      "name": "shop_parts",
+      "objects": 7,
+      "triangles": 908
+    },
+    {
+      "bytes": 33936,
+      "family": "utility",
+      "file": "buildings/shop_supply.glb",
+      "kind": "scenery",
+      "name": "shop_supply",
+      "objects": 7,
+      "triangles": 484
+    },
+    {
+      "bytes": 156684,
+      "family": "civic",
+      "file": "buildings/specialist_yard.glb",
+      "kind": "operational",
+      "name": "specialist_yard",
+      "objects": 9,
+      "triangles": 2656
+    },
+    {
+      "bytes": 81620,
+      "family": "hardened",
+      "file": "buildings/threat_lab.glb",
+      "kind": "operational",
+      "name": "threat_lab",
+      "objects": 8,
+      "triangles": 1324
+    },
+    {
+      "bytes": 37692,
+      "family": "civic",
+      "file": "buildings/transit_pavilion.glb",
+      "kind": "scenery",
+      "name": "transit_pavilion",
+      "objects": 6,
+      "triangles": 628
+    },
+    {
+      "bytes": 21460,
+      "family": "utility",
+      "file": "buildings/utility_shed_a.glb",
+      "kind": "scenery",
+      "name": "utility_shed_a",
+      "objects": 5,
+      "triangles": 304
+    },
+    {
+      "bytes": 21464,
+      "family": "utility",
+      "file": "buildings/utility_shed_b.glb",
+      "kind": "scenery",
+      "name": "utility_shed_b",
+      "objects": 5,
+      "triangles": 304
+    },
+    {
+      "bytes": 334248,
+      "family": "civic",
+      "file": "buildings/verification_institute.glb",
+      "kind": "operational",
+      "name": "verification_institute",
+      "objects": 8,
+      "triangles": 5976
+    }
+  ],
+  "generator": "tools/blender/build_all.py",
+  "scale": "1 unit = 1 metre",
+  "totals": {
+    "bytes": 5746688,
+    "files": 35,
+    "triangles": 99992
+  }
+}

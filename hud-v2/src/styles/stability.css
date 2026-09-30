@@ -1,0 +1,294 @@
+/* ARGUS HUD V2 — STRUCTURAL STABILIZATION PASS 1.
+   Loaded LAST (after icons.css, see main.ts) so these rules win the cascade
+   without editing the sheets other passes own. Scope is strictly the measured
+   structural defects from the UI audit (.freebuff/ui_qa*.json): typography
+   floor, scroll affordance, sticky-rail reachability, long-status wrapping,
+   and clearance. No redesign, no new data, no layer-token changes.
+
+   Audit method: every flagged text overlap was hit-tested with
+   elementFromPoint — the header/footer/winners own every contested pixel,
+   i.e. the "overlaps" were clipped-content ghosts of the scroll container.
+   The fixes below therefore target the four REAL defects:
+
+     1. text rendered below the 9px readability floor  (§12)
+     2. sticky PageRail taller than the viewport on 1366x768
+     3. invisible 6px scrollbar on the 300px dashboard overflow (§9/§10)
+     4. missing clearance so clipped ghosts can never read as collisions */
+
+/* ================================================================
+   1. TYPOGRAPHY FLOOR — nothing below 9px carries meaning.
+   Measured 8px clusters (audit, all viewports): network topology chain,
+   footer status chips, PageRail meters, alert-list severity rows, threat
+   trend caption + counts, security matrix cells, lifecycle rail, node
+   chain footnotes, signal-grid labels, dock help line, footer lines.
+   Targets: telemetry 9.5-10px here (11-12px where the panel has room);
+   decorative SVG rim indices stay nonessential but land at >=9px too.
+   ================================================================ */
+.topology-chain { font-size: clamp(10px, .62vw, 11px) !important; }
+.net-count span { font-size: clamp(10px, .58vw, 11px) !important; }
+.status-chips span { font-size: 9.5px !important; }
+.global-status { font-size: 9.5px !important; }
+.hud-footer { font-size: 9.5px !important; }
+.footer-signature span,
+.footer-owner span { font-size: 9.5px; }
+.rail-meter { font-size: 9.5px !important; }
+.alert-list div { font-size: 9.5px !important; }
+.trend > span,
+.trend > b { font-size: 10px !important; }
+.chip { font-size: 9px !important; }
+.lifecycle-rail { font-size: 9px !important; }
+.node-chain small { font-size: 9px !important; }
+.signal-grid span { font-size: 9px !important; }
+.matrix-grid > div { font-size: 9px !important; }
+.command-dock .command-help { font-size: 9.5px !important; }
+.ring-label { font-size: 9.5px !important; }
+.ring-index { font-size: 9px !important; }
+.arch-node .arch-sub { font-size: 9px !important; }
+.arch-node .arch-tick { font-size: 9px !important; }
+.arch-foot { font-size: 9px !important; }
+
+/* ================================================================
+   2. VISIBLE SCROLL AFFORDANCE (§9/§10).
+   The dashboard legitimately scrolls ~300px at 1366x768; the previous
+   6px 30%-alpha scrollbar was effectively invisible, so the page read as
+   broken/clipped. A 9px gutter with a brighter thumb makes the scroll
+   state honest at a glance (Firefox gets scrollbar-width/color).
+   ================================================================ */
+.page-content { scrollbar-width: thin; scrollbar-color: rgba(0, 234, 242, .45) rgba(255, 255, 255, .04); }
+.page-content::-webkit-scrollbar { width: 9px; }
+.page-content::-webkit-scrollbar-track { background: rgba(255, 255, 255, .04); }
+.page-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 234, 242, .45);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 6px;
+}
+.page-content::-webkit-scrollbar-thumb:hover { background: rgba(0, 234, 242, .65); background-clip: padding-box; }
+
+/* ================================================================
+   3. STICKY PAGE RAIL — sticky only when it actually fits (§10/§19).
+   The rail is ~760px tall; on a 768-high screen the scroll container is
+   ~570-660px, so position:sticky made the rail's lower half permanently
+   unreachable mid-scroll (measured: rail bottom never rose above -123px).
+   Keep the sticky behaviour on tall viewports where it works; let the
+   rail participate in normal flow wherever it is taller than the
+   viewport, so every block (RUNTIME, TOP PROCESSES) stays reachable.
+   ================================================================ */
+@media (min-height: 880px) {
+  .page-rail { position: sticky; top: 0; }
+}
+@media (max-height: 879px) {
+  .page-rail { position: static; }
+}
+/* Shrink discipline for the rail's long values (§11): a 272px rail with
+   9.5px mono fits ~34 characters; values longer than that wrap instead of
+   forcing the column wider or colliding with the main panel. */
+.page-rail { min-width: 0; min-height: 0; }
+.rail-kv b { overflow-wrap: anywhere; }
+.rail-meter span { overflow: hidden; text-overflow: ellipsis; }
+
+/* ================================================================
+   4. LONG STATUS MESSAGES WRAP, NEVER STRETCH (§6).
+   The Operations status strip is one long inline sentence row; wrap the
+   strip itself (items stay intact) instead of letting it overflow or
+   compress into unreadable slivers. PageRail/panel notes already inherit
+   normal wrapping; this guards the strip and the footer chip row.
+   ================================================================ */
+.ops-status-strip { flex-wrap: wrap; row-gap: 4px; }
+.ops-status-strip .status-item { min-width: 0; }
+.status-chips { gap: 10px; }
+.status-chips span { border-left-width: 1px; padding-left: 10px; }
+.notification-center summary b { margin-left: 6px; }
+
+/* ================================================================
+   5. CLEARANCE — headings and the last panel never touch chrome (§22).
+   The dashboard's first row sat flush against the header band and its
+   last row flush against the footer; ghost hit-tests flagged both edges.
+   Breathing room removes the ambiguity without changing the composition.
+   Applied to EVERY page: at scroll-top on 1366x768 the secondary pages'
+   last rail section (e.g. TOP PROCESSES) otherwise sits exactly inside
+   the fixed footer band, reading as a collision.
+   ================================================================ */
+.dashboard-page { padding-top: 8px; }
+.page-content > .page-enter { padding-bottom: 24px; }
+
+/* (Brand subtitle truncation lived here. The identity lockup is now
+   BrandLockup.svelte, which owns its own sizing; see Header.svelte.) */
+
+/* Security matrix cells: keep long backend sentences inside their own
+   column (already ellipsized); give the value room to breathe. */
+.matrix-grid > div { min-width: 0; }
+
+/* ================================================================
+   6. HEADER CLOCK — never pushes the shell wider than the viewport.
+   Measured (pass 2 audit): .clock had flex:0 0 auto (cockpit.css) plus an
+   overflow:visible date line (shell.css max-width:160px), so the long
+   "FRI, SEP 18, 2026 · BACKEND LINKED" string PAINTED ~42px past 1366 and
+   .hud-viewport scrolled the entire shell sideways (header/footer/page all
+   shifted left; every panel's left border sat off-screen). The clock now
+   yields like every other header zone: it may shrink, its line ellipsizes,
+   and the connection state (functional data, duplicated in the footer
+   status chips) is written FIRST so any truncation costs the decorative
+   date, never the state.
+   ================================================================ */
+.header-right .clock { flex: 0 1 auto; max-width: 100%; }
+.clock span { overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+/* Safety net (ARGUS rule: overflow is vertical, never sideways): the shell
+   host must not scroll horizontally. clip (not hidden) creates no scroll
+   container, so sticky layout and the vertical scroller are untouched. */
+.hud-viewport { overflow-x: clip; }
+
+/* <=1400: one responsive step tighter on header gutters instead of
+   shrinking any font (wordmark/identity untouched). */
+@media (max-width: 1400px) {
+  .command-header { gap: 8px; padding: 0 8px; }
+}
+
+/* ================================================================
+   7. PREMIUM BOLD READABILITY SCALE (pass 2, revised).
+   User call: "icons and main texts near icons are too small - must
+   enlarge", and earlier passes hid nav icons on narrow widths. Revised
+   scale keeps icons VISIBLE and grows them WITH their labels: bold
+   faces, larger glyph anchors, generous hit areas.
+   ================================================================ */
+/* Primary nav + micro strip: REMOVED from this sheet (design pass 1). The old
+   15px/800 label + 20px icon scale made the glyph read no bigger than its
+   text; the strip is now owned by Header.svelte (icon 20 > label 13, gap 8).
+   Icons still stay visible at every supported desktop width. */
+/* Page heading + subtabs: title 26px, subtabs 11px -> 13px bold. */
+.page-heading h1 { font-size: 26px !important; font-weight: 800 !important; }
+.subtabs button { font-size: 13px !important; font-weight: 800 !important; padding: 7px 12px !important; }
+.subtabs { gap: 6px; }
+/* Panel titles (every page): 16px -> 18px bold. */
+.panel-title h2 { font-size: 18px !important; font-weight: 800 !important; }
+/* Panel status chips ride the title row: 10px -> 12px bold. */
+.panel-title .status { font-size: 12px !important; font-weight: 800 !important; }
+/* Metric tiles (CPU/MEM/GPU/DISK): label 11px -> 13px bold, value and icon
+   grow with it — the icon sits beside the label, not above it. */
+.metric-grid article>span:first-child { font-size: 13px !important; font-weight: 800 !important; gap: 7px; }
+.metric-grid article>span:first-child svg { width: 16px !important; height: 16px !important; }
+/* Security rows: label 11px -> 13px bold, row icon 16px. */
+.row-label { font-size: 13px !important; font-weight: 700 !important; }
+.row-icon svg { width: 16px !important; height: 16px !important; }
+/* Timeline tabs: 8px -> 11px bold. */
+.tl-tabs button { font-size: 11px !important; font-weight: 800 !important; padding: 4px 10px !important; }
+/* Ring decoration text REMOVED (user call: no overlaying texts). The ring
+   labels/sector indexes were 8.5-12px mono strings painted across the core
+   visual — pure decoration, zero data. The ring GRAPHICS stay; the text is
+   gone. */
+.ring-label, .ring-index { display: none !important; }
+/* Security row labels: the 13px floor must beat detail.css's older 11px-ish
+   rule — same sheet-order, so restate the full declaration with the row
+   layout detail.css owns (ellipsis) plus the size. */
+.security-row .row-label { font-size: 13px !important; font-weight: 700 !important; }
+/* Footer chips: 10px bold is the measured-fit ceiling for all seven chips at
+   1366x768 (10.5px re-overflowed the row — measured). Fit guards stay: each
+   chip ellipsizes individually so the row degrades per chip, never clips. */
+.status-chips span { font-size: 10px !important; font-weight: 700 !important; }
+
+/* ================================================================
+   8. DECORATIVE OVERLAY CONTAINMENT (pass 2).
+   Absolute/fixed decorative layers (ambient particles, orbit dots, rim
+   glows) must never paint over real text: no pointer events, clipped to
+   their own panels, behind content. Animated ambient field inside the
+   core panel is capped to its bounds so particles cannot drift across
+   the page.
+   ================================================================ */
+.core-ambient, .globe-pulse, .ring-micro .orbit-dot {
+  pointer-events: none;
+}
+.identity-core { position: relative; overflow: hidden; }
+.identity-core .argus-core { position: relative; z-index: 1; }
+.core-ambient { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+
+/* Long status lines wrap inside their panels, never stretch across the
+   dashboard (pass 2 re-check). */
+.core-status-line, .rail-note, .office-lede { overflow-wrap: anywhere; }
+
+/* (Header identity column stacking lived here. The lockup now carries the
+   micro strip as its own third line -- see BrandLockup.svelte / Header.svelte.) */
+
+/* Agents page sub-headline size parity with other pages. */
+.office-head h1 { font-size: 26px !important; font-weight: 800 !important; }
+
+/* ================================================================
+   10. SECURITY PAGE PASS -- scoped to .security-grid ONLY. The
+   dashboard rail keeps its compact presentation; these rules cannot
+   reach it because .security-grid exists only on Security pages.
+
+   Root cause of the crushed Threat Monitor: ux.css forces
+   `.threat .trend { height:48px; overflow:hidden }` and snapshot.css
+   forces `display:flex` -- both load AFTER detail.css and override its
+   real two-row graph design, clipping the bar grid and painting the
+   status labels over it. Scoped reversal + readable micro text.
+   ================================================================ */
+/* --- Threat Monitor: full-size trend, real grid, honest heights --- */
+.security-grid .panel.threat {
+  grid-template-rows: auto auto minmax(220px, 1fr) auto;
+}
+.security-grid .threat .trend {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr); /* kill ux.css's 1fr auto -- it
+     auto-places the status label INTO the bars row (r1c2) */
+  grid-template-rows: 64px auto auto;
+  gap: 8px;
+  height: auto;
+  min-height: 212px;
+  align-content: start;
+  overflow: visible;
+  padding-bottom: 0;
+}
+.security-grid .threat .trend > .trend-grid {
+  height: 64px;
+}
+/* Labels sit in their own grid rows -- never over the bars. */
+.security-grid .threat .trend > span,
+.security-grid .threat .trend > b {
+  position: static;
+  font: 700 11px var(--font-data, var(--mono));
+  letter-spacing: .07em;
+  padding-top: 4px;
+}
+.security-grid .threat .trend b { color: var(--secondary); }
+/* Recent alerts: taller list, real timestamps (backend sends them),
+   normal 3-column alert row (time + severity + label). */
+.security-grid .panel.threat .alert-list { max-height: 200px; }
+.security-grid .alert-list div { grid-template-columns: 64px 76px minmax(0, 1fr); font: 700 11px var(--mono); }
+.security-grid .alert-list time { display: block; font: 600 10.5px var(--mono); color: var(--muted); }
+/* --- Control matrix / severity / timeline: readable micro text --- */
+.security-grid .matrix-grid > div b { font-size: 11px; }
+.security-grid .matrix-grid > div span { font-size: 11px; }
+.security-grid .severity-bars > div { grid-template-columns: 76px minmax(0, 1fr) 34px; font: 700 10.5px var(--mono); }
+.security-grid .severity-bars > div i { height: 7px; }
+.security-grid .mini-events > div { grid-template-columns: 64px 64px minmax(0, 1fr); font: 11px var(--mono); padding: 6px 0; }
+.security-grid .mini-events > div time { font-size: 10.5px; }
+.security-grid .mini-events > div span { white-space: normal; line-height: 1.35; }
+.security-grid .recent h3,
+.security-grid .security-decision h3,
+.security-grid .sub { font: 700 11px var(--mono); letter-spacing: .1em; }
+.security-grid .threat-counts .sev { font: 600 11.5px var(--font-data, var(--mono)); }
+.security-grid .threat-counts .sev b { font: 700 13px/1.1 var(--font-data, var(--mono)); }
+/* Status rows: same 11px pairing as the matrix; keep ellipsis but let
+   long values use the row instead of a 58%-cap that truncates early. */
+.security-grid .security-row { font-size: 12px; }
+.security-grid .security-row b { max-width: 62%; font-size: 11.5px; }
+.security-grid .security-row .row-label { font-size: 11.5px; }
+.security-grid .security-decision div { font: 700 11px var(--mono); }
+/* --- Panel rhythm: consistent inner padding, no border-touching --- */
+.security-grid .panel { padding: 14px 16px; }
+.security-grid .panel-title { margin-bottom: 10px; }
+
+/* --- Audit tab: EventTimeline renders bare under [data-page=security]
+   (no .security-grid ancestor). Its base text is 8-10px -- same floor. --- */
+[data-page="security"] .event-list div,
+[data-page="security"] .event-list button {
+  grid-template-columns: 64px 64px minmax(0, 1fr);
+  font: 11px var(--mono);
+  padding: 5px 0;
+}
+[data-page="security"] .event-list time { font-size: 10.5px; }
+[data-page="security"] .event-list b { font-size: 10.5px; }
+[data-page="security"] .event-list button span { white-space: normal; line-height: 1.35; }
+[data-page="security"] .tl-tabs button { font: 700 10px var(--mono); padding: 3px 9px; }
+[data-page="security"] .tl-live { font: 700 10px var(--mono); }

@@ -1,0 +1,92 @@
+/* ARGUS HUD V2 -- Phosphor icon language.
+   Loaded LAST (see main.ts, after cockpit.css) so these rules win the
+   cascade. Semantic aliases + the size scale live in src/lib/ui/icons.ts;
+   THIS sheet owns layout, alignment and state only. Icons default to
+   currentColor, so their colour arrives from the semantic UI state already
+   defined in type.css/ux.css (muted default, cyan active, emerald ok, amber
+   warn, red critical). Prohibited here: per-icon font tricks, arbitrary
+   sizes, thick glows and continuous spin. */
+
+/* ---- Generic label + icon rows: optical vertical alignment ---- */
+.icon-inline{display:inline-flex;align-items:center;gap:6px}
+.icon-inline.gap-sm{gap:5px}
+
+/* ---- Panel/header prefix icons.
+   Sit before the title text, next to the existing 4px accent dot from
+   detail.css. Muted so the uppercase title stays the hierarchy anchor. ---- */
+.h2-icon{display:inline-block;vertical-align:-2px;margin-right:6px;color:var(--muted);flex:0 0 auto}
+
+/* ---- Primary nav + MORE dropdown: icon/label layout now lives in
+   Header.svelte (icon 20 > label 13, gap 8; menu icons 18, gap 10). ---- */
+
+/* ---- Micro-nav separators: crisp SVG chevron between tactical stops.
+   Replaces the old 8px text-glyph '›' that rendered clipped and left an
+   uneven gap beside each arrow. stroke currentColor, sized to the strip. ---- */
+.micro-chev{width:7px;height:7px;fill:none;stroke:currentColor;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;color:color-mix(in srgb,var(--cyan) 40%,transparent);display:inline-block;vertical-align:-1px;flex:0 0 auto}
+
+/* ---- System metrics: icon left of the label; value stays dominant ---- */
+.metric-grid article>span:first-child{display:inline-flex;align-items:center;gap:5px}
+.metric-grid article>span:first-child svg{flex:0 0 auto}
+
+/* ---- Security rows: per-row icon replaces the old <svg class="shield"> ---- */
+.row-icon{flex:0 0 auto;color:var(--secondary);vertical-align:-2px}
+
+/* ---- Threat severity inline row: icon + count + label ---- */
+.threat-counts .sev{display:inline-flex;align-items:center;gap:5px}
+.threat-counts .sev svg{flex:0 0 auto}
+.threat-counts .sev-critical svg{color:var(--red)}
+.threat-counts .sev-high svg{color:var(--amber)}
+.threat-counts .sev-medium svg{color:var(--amber)}
+.threat-counts .sev-low svg{color:var(--green)}
+
+/* ---- Threat empty-state icon ---- */
+.recent-ok{display:inline-flex;align-items:center;margin-right:5px;color:var(--muted);vertical-align:-3px}
+.recent-ok.ok{color:var(--green)}
+
+/* ---- Command console button icons: centred, not font-scaled ---- */
+.command-line button{display:flex;align-items:center;justify-content:center}
+.command-line button svg{display:block}
+
+/* ---- Bottom command row (dashboard dock + persistent dock): the console is
+   a primary input — comfortably sized, never oversized. Mic/send glyphs are
+   bumped off the 18px baseline (inline `size` prop is overridden by these
+   !important tokens); input text reads at a UI scale. Loads last, so it beats
+   shell.css / ux.css. ---- */
+.dashboard-operations .command-line,
+.command-dock .command-line,
+.command .command-line {
+  grid-template-columns: 42px minmax(0, 1fr) 42px !important;
+  gap: 7px !important;
+}
+.dashboard-operations .command-line button,
+.command-dock .command-line button,
+.command .command-line button {
+  height: 40px !important;
+}
+.command-line button svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+.dashboard-operations .command input,
+.command-dock .command input,
+.command .command input {
+  font-size: 14px !important;
+  padding: 0 12px !important;
+}
+.command input::placeholder {
+  color: color-mix(in srgb, var(--secondary) 78%, var(--cyan-soft)) !important;
+  opacity: 1 !important;
+}
+
+/* ---- Bottom of the dashboard: the lower panel must not slam into the window
+   edge — a little air under .dashboard-lower keeps the ending soft. ---- */
+.dashboard-page { padding-bottom: 16px !important; }
+.dashboard-page .dashboard-lower { margin-bottom: 0; }
+
+/* ---- Module tiles: component replaces the raw glyph; keep cell sizing ---- */
+.module-tile .tile-icon{display:grid;place-items:center}
+.module-tile .tile-icon svg{display:block}
+
+/* ---- Task plan: status icon centred in its marker cell ---- */
+.task-plan i{display:grid;place-items:center}
+.task-plan i svg{display:block}

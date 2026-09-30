@@ -1,0 +1,174 @@
+/* ARGUS HUD V2 — DASHBOARD DENSITY + READABILITY PASS.
+   Loaded LAST (see main.ts). This sheet owns:
+     1. the type / icon / rhythm token scale (--ds-*),
+     2. the shell's four grid rows (header | page | dock | footer),
+     3. the single-screen Dashboard grid (.dash / .dash-rail),
+     4. the shared dashboard primitives (.dchip, .dk/.dv, .drows/.drow),
+     5. the ARGUS core's height-driven sizing.
+   Everything except (5) is keyed on NEW class names, so none of the legacy
+   dashboard rules (.dashboard-page, .summary-rail, .metric-grid, .panel …) can
+   reach it, and nothing here can leak onto the other pages. The core's DOM
+   predates this pass, so its rules carry !important where the legacy core
+   sheets did.
+
+   PRIMARY RULE: content fits its frame. Panels are as tall as their content;
+   leftover rail height is shared out as slightly taller rows, never as an
+   empty cavity. Nothing here hides overflow to cover a layout problem. */
+
+/* ================================================================
+   1. TOKEN SCALE — 1366x768 -> 1920x1080
+   Each token interpolates between its low and high stop on the SMALLER of
+   the width progress and the height progress, then clamps. A short or a
+   narrow window therefore always lands on the low end (readable, compact)
+   and only a genuinely large canvas reaches the high end.
+   ================================================================ */
+:root {
+  /* type */
+  --ds-page:  clamp(22px, min(calc(22px + (100vw - 1366px) * .00722), calc(22px + (100vh - 768px) * .01282)), 26px);
+  --ds-title: clamp(16px, min(calc(16px + (100vw - 1366px) * .00361), calc(16px + (100vh - 768px) * .00641)), 18px);
+  --ds-label: clamp(14px, min(calc(14px + (100vw - 1366px) * .00361), calc(14px + (100vh - 768px) * .00641)), 16px);
+  --ds-value: clamp(24px, min(calc(24px + (100vw - 1366px) * .01444), calc(24px + (100vh - 768px) * .02564)), 32px);
+  --ds-ui:    clamp(13px, min(calc(13px + (100vw - 1366px) * .00181), calc(13px + (100vh - 768px) * .00321)), 14px);
+  --ds-data:  clamp(12px, min(calc(12px + (100vw - 1366px) * .00181), calc(12px + (100vh - 768px) * .00321)), 13px);
+  --ds-sec:   clamp(11px, min(calc(11px + (100vw - 1366px) * .00361), calc(11px + (100vh - 768px) * .00641)), 13px);
+  --ds-micro: 10px;
+  /* icons */
+  --ds-icon-card:  clamp(30px, min(calc(30px + (100vw - 1366px) * .02166), calc(30px + (100vh - 768px) * .03846)), 42px);
+  --ds-icon-title: clamp(20px, min(calc(20px + (100vw - 1366px) * .00722), calc(20px + (100vh - 768px) * .01282)), 24px);
+  --ds-icon-row:   clamp(16px, min(calc(16px + (100vw - 1366px) * .00722), calc(16px + (100vh - 768px) * .01282)), 20px);
+  /* severity palette, shared by the threat charts, the counters and the alert rows:
+     low / normal = cyan, medium = amber, high = orange, critical = red */
+  --sev-critical: #ff4a63; --sev-high: #ff8f4d; --sev-medium: #ffc24d; --sev-low: #38e0ff;
+  /* rhythm */
+  --ds-row:   clamp(24px, min(calc(24px + (100vw - 1366px) * .01805), calc(24px + (100vh - 768px) * .03205)), 34px);
+  --ds-gap:   clamp(6px, min(calc(6px + (100vw - 1366px) * .00722), calc(6px + (100vh - 768px) * .01282)), 10px);
+  --ds-pad-y: clamp(8px, min(calc(8px + (100vw - 1366px) * .00903), calc(8px + (100vh - 768px) * .01603)), 13px);
+  --ds-pad-x: clamp(11px, min(calc(11px + (100vw - 1366px) * .00542), calc(11px + (100vh - 768px) * .00962)), 14px);
+}
+
+/* ================================================================
+   2. SHELL ROWS — header | page | dock | footer, at every height.
+   The Dashboard now carries the same slim command dock as every other page,
+   so it is a four-child grid like they are. cockpit.css's short-window rule
+   declared THREE rows (header | page | footer), which dropped the dock into
+   the 20px footer track wherever it was present; the four tracks are
+   restated here for both height bands.
+   ================================================================ */
+.app-shell { grid-template-rows: 72px minmax(0, 1fr) auto auto; }
+@media (max-height: 820px) {
+  .app-shell { grid-template-rows: 60px minmax(0, 1fr) auto auto; }
+}
+/* The footer row is `auto`: AppFooter.svelte sets its own height (30px, 28px on short
+   windows) so its 13px credit line is never squeezed into the old 20-22px track. */
+
+/* A page with no context rail (Authentication) uses the whole page width. */
+.page-body.auth-body { grid-template-columns: minmax(0, 1fr); }
+
+/* ================================================================
+   3. THE SINGLE-SCREEN DASHBOARD GRID
+   left rail ~24% | core ~52% | right rail ~24%. The row is exactly as tall as
+   the page area (height:100%), so the Dashboard never scrolls; ux.css's
+   height:auto / min-height:100% (which let the core's own height decide) is
+   overridden for the Dashboard only.
+   ================================================================ */
+.app-shell.dashboard-active .page-content > .page-enter { height: 100%; min-height: 0; padding-bottom: 0; }
+.dash {
+  display: grid; height: 100%; min-height: 0; min-width: 0; gap: var(--ds-gap);
+  grid-template-columns: minmax(0, 24fr) minmax(0, 52fr) minmax(0, 24fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+/* A rail is a column of frames that are each exactly as tall as their content.
+   --grow (set per panel) claims a share of whatever rail height is left over;
+   panels never shrink below their content (flex-shrink 0), so a rail that does
+   not fit scrolls the page area instead of overlapping its own frames. */
+.dash-rail { display: flex; flex-direction: column; gap: var(--ds-gap); min-width: 0; min-height: 0; }
+.dash-rail > .dpanel { flex: var(--grow, 0) 0 auto; }
+
+/* ================================================================
+   4. SHARED PRIMITIVES
+   ================================================================ */
+/* status chip: always inside its container (max-width + ellipsis), one line */
+.dchip {
+  display: inline-flex; align-items: center; min-width: 0; max-width: 100%;
+  padding: .32em .62em; border: 1px solid currentColor; border-radius: 2px;
+  font: 700 var(--ds-sec)/1 var(--font-data); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+  color: var(--secondary); background: color-mix(in srgb, currentColor 10%, transparent);
+}
+.dchip.ok { color: var(--green); }
+.dchip.warn { color: var(--amber); }
+.dchip.bad { color: var(--red); }
+.dchip.dim { color: var(--muted); }
+.dchip.info { color: var(--cyan-soft); }
+
+/* label / value text, tone-coloured. Labels are UI type (Space Grotesk),
+   values are data type (JetBrains Mono). */
+.dk { font: 600 var(--ds-ui)/1.1 var(--font-ui); letter-spacing: .06em; text-transform: uppercase; color: var(--secondary); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dv { font: 700 var(--ds-ui)/1.1 var(--font-data); letter-spacing: .03em; text-transform: uppercase; color: var(--text); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.dv.ok, .dk.ok { color: var(--green); }
+.dv.warn, .dk.warn { color: var(--amber); }
+.dv.bad, .dk.bad { color: var(--red); }
+.dv.dim, .dk.dim { color: var(--muted); }
+
+/* rows: a hairline-separated list whose row pitch (--ds-row) scales with the
+   window and whose rows share out any leftover height evenly (1fr), so a
+   panel that is given a little extra height gets slightly airier rows, not a
+   hole at the bottom. The NATURAL pitch is 3px under the token (rows grow back
+   into any leftover), which is what keeps a rail from overflowing when its
+   content runs long (offline verdict text, an action-request strip). */
+.drows { display: grid; grid-auto-rows: minmax(calc(var(--ds-row) - 3px), 1fr); min-width: 0; min-height: 0; }
+.drow { display: grid; align-items: center; column-gap: 9px; min-width: 0; border-top: 1px solid rgba(223, 251, 255, .075); }
+.drow:first-child { border-top: 0; }
+
+/* ================================================================
+   5. THE ARGUS CORE — sized by the height it is given
+   The core used to size itself (a ~560px square + a tall text lane), which set
+   the Dashboard row's height (883px) and forced the page to scroll. It now
+   fills the row: the .core-stage is a size container, the .core-visual is the
+   largest square that fits it, and the text lane sits directly beneath.
+   Untouched: robot image + masks, ring geometry, state / posture logic,
+   waveform behaviour, critical-state colouring.
+   ================================================================ */
+.dash-core { position: relative; min-width: 0; min-height: 0; }
+.dash .identity-core > .argus-core {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: minmax(0, 1fr) auto !important;
+  align-items: stretch !important; justify-items: stretch !important;
+}
+.dash .core-stage {
+  grid-column: 1; grid-row: 1; position: relative; container-type: size;
+  min-width: 0; min-height: 0; display: grid; place-items: center;
+}
+.dash .core-stage > .core-visual {
+  grid-row: auto !important; grid-column: auto !important;
+  inline-size: min(100cqw, 100cqh) !important; block-size: min(100cqw, 100cqh) !important;
+  max-inline-size: none !important; max-block-size: none !important; aspect-ratio: 1 / 1 !important;
+  margin: 0 !important; justify-self: center !important; align-self: center !important;
+}
+/* state ladder: pinned to the stage's TOP-LEFT corner. The bust's shoulders start
+   at ~half the stage height, so up here it sits in open bay instead of over the
+   armour (mid-height it painted its labels across the left shoulder). */
+.dash .core-stage > .state-ladder {
+  /* explicit area: core-lanes.css pins it to grid-row 2, which for an absolutely
+     positioned child would make row 2 (an implicit track BELOW the art) its
+     containing block and drop the ladder to the bottom of the stage */
+  grid-row: 1 !important; grid-column: 1 !important;
+  position: absolute !important; left: 6px !important; top: clamp(4px, 1.2vh, 12px) !important; transform: none !important;
+  gap: clamp(9px, 1.7vh, 16px) !important; padding-left: 0 !important;
+  font-size: var(--ds-data) !important; letter-spacing: .1em !important;
+}
+.dash .core-text {
+  grid-column: 1 !important; grid-row: 2 !important;
+  gap: clamp(4px, .7vh, 9px) !important; padding: 0 3% clamp(4px, .7vh, 8px) !important;
+}
+/* the header already carries the ARGUS // CORE brand: no second copy here */
+.dash .agent-state > span { display: none !important; }
+.dash .agent-state h1 { font-size: clamp(26px, min(1.9vw, 3.6vh), 38px) !important; letter-spacing: .1em !important; line-height: 1 !important; }
+.dash .agent-state p { font-size: var(--ds-sec) !important; letter-spacing: .06em !important; }
+.dash .voice-waveform { width: min(62%, 420px) !important; }
+/* speaking: the backend's voice_state 'speaking' (spoken reply playing) -- the same green pulse as execute */
+.wave-speak .wave-bars i { animation: wave-process 1.1s linear infinite; animation-delay: calc(var(--d, 0) * -11ms); background: var(--green); }
+.dash .wave-bars { height: clamp(22px, 3.4vh, 32px) !important; }
+.dash .wave-bars i { height: calc(var(--h, .2) * clamp(22px, 3.4vh, 32px)) !important; }
+.dash .core-status-line { margin-top: 0 !important; font-size: var(--ds-data) !important; }
+.dash .core-status-band { font-size: var(--ds-data) !important; padding: 5px 12px !important; gap: 12px !important; }

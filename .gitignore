@@ -1,0 +1,49 @@
+hud/token.js
+
+# Cloud API credentials -- never committed. See config.py's CLOUD_* block:
+# config_secrets.py is imported with a try/except fallback specifically so
+# a fresh checkout without this file still runs (cloud features just stay
+# disabled), rather than the app failing to start over a missing secret.
+config_secrets.py
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Build output (PyInstaller)
+build/
+dist/
+
+# Runtime data / secrets
+*.log
+reply.wav
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+config_secrets.py
+config.py
+hud/token.js
+*.pem
+*.key
+*.p12
+*.pfx
+*.sqlite
+*.db
+.claude/
+
+# Local runtime and generated files
+hud-v2/node_modules/
+hud-v2/dist/
+voices/
+memory/
+disabled/
+tools/blender/preview/
+hud-v2/public/assets/3d/
+
+# Excluded from public source snapshots
+tests/
+docs/
+DESIGN.md

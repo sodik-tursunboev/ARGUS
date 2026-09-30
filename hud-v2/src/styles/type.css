@@ -1,0 +1,128 @@
+/* ARGUS HUD V2 -- type system + colour hierarchy.
+   Loaded after every layout sheet (see main.ts) so the role rules below win
+   the cascade. Two faces, two roles, kept visibly distinct:
+
+     UI         Space Grotesk: brand lockup, page/section titles, buttons,
+                nav, body copy (BrandLockup.svelte sets the brand in it --
+                the serif EB Garamond wordmark face was retired in design
+                pass 1, with its @font-face and --font-brand token)
+     DATA       JetBrains Mono: telemetry values, timestamps, ids, chips
+
+   Both faces are bundled from their OFL npm packages and emitted by Vite into
+   dist/assets (signed with the rest of the build). Nothing is fetched at
+   runtime; the CSP's font-src stays 'self'. All sizes are in the 1920x1080
+   canvas coordinate system (see canvas.css). */
+
+@font-face{font-family:'Space Grotesk Variable';font-style:normal;font-display:block;font-weight:300 700;src:url('../../node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2') format('woff2-variations')}
+@font-face{font-family:'JetBrains Mono Variable';font-style:normal;font-display:block;font-weight:100 800;src:url('../../node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2') format('woff2-variations')}
+
+:root{
+  --font-ui:'Space Grotesk Variable','Bahnschrift','Segoe UI',system-ui,sans-serif;
+  --font-data:'JetBrains Mono Variable','Cascadia Mono',Consolas,monospace;
+  /* legacy alias: every older rule that says var(--mono) now gets the data face */
+  --mono:var(--font-data);
+  /* type scale @1920 */
+  --t-title:22px;--t-section:15px;--t-value:22px;--t-ui:13px;--t-data:11.5px;--t-micro:9.5px;
+  /* colour hierarchy: near-white primary text, muted steel-blue secondary,
+     deep teal structure, cyan accent only, emerald good, warm amber warning,
+     controlled red critical. Primary text is deliberately cooler/whiter than
+     secondary to create a readable two-tier hierarchy. */
+  --text:#edf8fa;--secondary:#94bcc5;--muted:#537a84;
+  --structure:#134a53;--line:rgba(24,116,128,.38);--line-soft:rgba(160,220,228,.07);
+  --cyan:#00eaf2;--cyan-soft:#6ef3fb;--green:#2df0a6;--amber:#ffc24d;--red:#ff4a63;
+  font-family:var(--font-ui);color:var(--text);font-variant-ligatures:none;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility
+}
+body{color:var(--text)}
+
+/* ---------- UI role: titles, nav, buttons ---------- */
+.app-shell h2,.panel h2,.dashboard-page h2,.command-dock h2,.auth-gate h2,.command-palette header b,.detail-drawer header h2{font:700 var(--t-section)/1.1 var(--font-ui);letter-spacing:.06em;text-transform:uppercase;color:var(--text)}
+.dashboard-lower h2,.dashboard-left h2,.dashboard-right h2{letter-spacing:.055em}
+.rail-block h3,.sub,.recent h3,.security-decision h3,.matrix-head h3{font:700 11px/1.1 var(--font-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--secondary)}
+.page-heading h1{font:700 var(--t-title)/1.1 var(--font-ui);letter-spacing:.03em;color:var(--text)}
+.about-page h1{font:600 22px/1.25 var(--font-ui);letter-spacing:0;color:var(--text)}
+.app-nav button,.subtabs button{font:700 11px var(--font-ui);letter-spacing:.09em;text-transform:uppercase;color:var(--secondary)}
+.app-nav button.active,.subtabs button.active{color:var(--cyan-soft)}
+.more-nav,.more-nav .more-trigger{font:650 11px var(--font-ui);letter-spacing:.09em;color:var(--secondary)}
+.quick-grid button{font:600 12px var(--font-ui);letter-spacing:.01em;color:var(--text)}
+.quick-grid button i{color:var(--cyan-soft)}
+.auth-actions button,.setting-list button,.notice-popover header button,.tl-tabs button{font-family:var(--font-ui);letter-spacing:.08em}
+.setting-list b,.module-list b,.agent-grid h3{font:650 13px var(--font-ui);letter-spacing:0;text-transform:none;color:var(--text)}
+.module-tile .tile-name{font:650 10.5px var(--font-ui);letter-spacing:.1em}
+.node-chain b{font:650 9.5px var(--font-ui);letter-spacing:.1em}
+
+/* ---------- Body copy: readable UI text, never tiny uppercase mono ---------- */
+.objective-copy p{font:600 15px/1.25 var(--font-ui);letter-spacing:0;color:var(--text)}
+.objective-copy small,.recent p,.processes p,.rail-note,.about-page p,.auth-gate p,.auth-gate small,.unavailable p,.setting-list small,.module-list small,.agent-grid small,.agent-grid p,.notice-popover p,.command-palette p,.core-status-line,.goal-line,.objective-idle p,.settings-note,.command-palette>div button span,.notice-popover>button span{font-family:var(--font-ui);font-weight:500;text-transform:none;letter-spacing:0}
+.objective-copy small,.recent p,.processes p,.setting-list small,.module-list small,.agent-grid small{font-size:12px;line-height:1.35;color:var(--secondary)}
+.rail-note,.unavailable p,.about-page p{font-size:12.5px;line-height:1.45;color:var(--secondary)}
+.objective-idle p{font-size:11.5px;color:var(--muted)}
+.core-status-line{font:italic 500 12px var(--font-ui);letter-spacing:.02em;color:var(--secondary)}
+.goal-line{font:600 14px var(--font-ui)}
+.auth-gate p{font-size:13px;line-height:1.4}
+.recent p span{color:var(--muted);font-size:14px}
+
+/* ---------- DATA role: values are strong, labels stay technical ---------- */
+.metric-grid b,.process-values b,.net-count b,.threat-counts b,.clock b,.security-summary b,.objective-copy .target{font-family:var(--font-data);font-variant-numeric:tabular-nums}
+.metric-grid b{font-weight:700;font-size:var(--t-value);line-height:1;color:var(--text)}
+.process-values b{font:700 19px/1.1 var(--font-data);color:var(--text)}
+.net-count b{font:700 16px/1.1 var(--font-data);color:var(--text)}
+.threat-counts b{font:700 16px/1.1 var(--font-data)}
+.metric-grid span,.metric-grid small,.processes p,dt,.net-count span,.process-values span,.security-row span,.rail-kv span,.signal-grid span,.matrix-grid>div span,.stack-grid span{font-family:var(--font-data);font-weight:600;letter-spacing:.07em;text-transform:uppercase}
+.metric-grid span,dt,.security-row span,.net-count span,.process-values span{font-size:10px;color:var(--secondary)}
+.metric-grid small{font-size:var(--t-micro);color:var(--muted)}
+dd,.security-row b,.rail-kv b,.signal-grid b,.matrix-grid>div b,.stack-grid b{font-family:var(--font-data);font-weight:700;font-variant-numeric:tabular-nums}
+dd,.security-row b{font-size:var(--t-data);color:var(--text)}
+.status{font:650 var(--t-micro) var(--font-data);letter-spacing:.09em;border-radius:2px;background:color-mix(in srgb,currentColor 10%,transparent)}
+.event-list time,.mini-events time,.notice-popover time,.event-list span,.mini-events span{font-family:var(--font-data)}
+.event-list button,.event-list div{font-size:10.5px}
+.event-list time{font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.chip,.event-list b{font-family:var(--font-data);font-weight:650;letter-spacing:.08em}
+.command input,.command-palette input,.auth-gate input,.setting-list input:not([type=checkbox]){font-family:var(--font-data)}
+.command input{font-size:11.5px;color:var(--text)}
+.command input::placeholder{color:var(--muted)}
+.command-help,.wave-caption,.core-meta,.task-progress,.state-ladder,.security-ladder,.topology-chain,.footer-signature,.footer-owner,.global-status,.hud-footer,.header-mode,.micro-nav,.security-freshness,.tl-live,.plan-title,.timeline-head span{font-family:var(--font-data);font-weight:600}
+.state-ladder,.security-ladder{font-size:10.5px;letter-spacing:.12em}
+.task-progress{font-size:9.5px;letter-spacing:.08em}
+.core-meta{font-size:9px}
+.agent-state span{font:600 10px var(--font-data);letter-spacing:.22em;color:var(--muted)}
+.agent-state h1{font:700 23px/1 var(--font-ui);letter-spacing:.12em;color:var(--core-color,var(--cyan-soft))}
+.agent-state p{font:600 9.5px var(--font-data);letter-spacing:.08em;color:var(--secondary)}
+.plan-title{font-size:10px;letter-spacing:.07em}
+.task-plan .step-label{font:600 11.5px var(--font-data);color:var(--secondary)}
+.task-plan .step-number,.task-plan small{font:600 9px var(--font-data);color:var(--muted)}
+
+/* ---------- Clock: premium, not a digital alarm clock ---------- */
+.clock{gap:2px}
+.clock span{font:700 9.5px var(--font-data);letter-spacing:.08em;color:var(--muted)}
+.clock b{font:700 22px/1 var(--font-data);letter-spacing:.01em;color:var(--text)}
+
+/* ---------- Colour hierarchy: cyan is an accent, amber means warning ---------- */
+.bars i{background:rgba(23,110,122,.32)}
+.bars i.active{background:var(--cyan)}
+.process-values b,.net-count b{color:var(--text)}
+dd{color:var(--text)}
+.objective-copy .target{color:var(--cyan-soft);font-size:26px}
+.plan-title b,ol i{color:var(--secondary)}
+.progress{background:rgba(23,110,122,.32)}.progress i{background:var(--cyan)}
+.command-line button{color:var(--cyan-soft)}
+.security-row b{color:var(--text)}
+.security-row b.ok,dd.ok,.status.ok{color:var(--green)}
+.security-row b.warn,dd.warn,.status.warn,.status.unknown,.unknown{color:var(--amber)}
+.security-row b.bad,dd.bad,.status.bad{color:var(--red)}
+.security-row b.dim,dd.dim{color:var(--muted)}
+.dashboard-right .security-summary:not(.critical):not(.unknown)>span,.dashboard-right .security-summary:not(.critical):not(.unknown) b{color:var(--green)}
+.dashboard-right .security-summary:not(.critical){border-color:var(--line-soft);background:linear-gradient(90deg,rgba(45,240,166,.06),transparent 70%)}
+.dashboard-right .security-summary.unknown{background:linear-gradient(90deg,rgba(255,194,77,.06),transparent 70%)}
+.security-summary small{color:var(--secondary)}
+.trend-grid i{background:linear-gradient(to top,rgba(24,116,128,.7),rgba(24,116,128,.15));border-top-color:rgba(110,243,251,.5)}
+.recent p span{color:var(--muted)}
+.notice-popover>button b{color:var(--secondary)}
+.alert-list b{color:var(--amber)}
+.footer-signature span:first-child{color:var(--secondary)}
+.core-top b{color:var(--text)}
+.topology-chain{color:var(--secondary)}
+.wave-caption{color:var(--muted)}
+.rail-kv b{color:var(--text)}
+.signal-grid b{color:var(--text)}
+.status.amber{color:var(--amber)}

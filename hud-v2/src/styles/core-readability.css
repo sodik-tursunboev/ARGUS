@@ -1,0 +1,443 @@
+/* ARGUS HUD V2 — core-readability overlay.
+   Loaded after operations.css, before icons.css (see main.ts).
+
+   This pass raises every operational text element to the approved minimums
+   for a 1920×1080 tactical interface — no global transform scaling, no
+   fake zoom, real pixel sizes:
+
+     PAGE TITLE   22-26px    .page-heading h1
+     PANEL TITLE  15-17px    .panel h2, .ops-section h2
+     NORMAL UI    13-14px    body, nav, status-band, event-list, table rows
+     IMPORTANT    17-22px    metric values, clock time, agent-state h1
+     CORE STATE   28-36px    agent-state h1
+     NON-ESSENTIAL ≤10px     core-top, footer, micro-nav (informational only)
+
+   Sizes 9-10px are retained ONLY where the element is genuinely decorative
+   (tick-marks, very bottom-line timestamps). All user-facing text that
+   carries meaning is ≥12px. */
+
+/* ================================================================
+   1. TOKEN OVERRIDES — raise the entire type scale
+   ================================================================ */
+:root {
+  /* Title bumped from 22→24: page titles, about-page h1 */
+  --t-title: 24px;
+  /* Section bumped from 14→16: panel headings, dashboard h2 */
+  --t-section: 16px;
+  /* Value stays at 20: important numeric callouts */
+  --t-value: 20px;
+  /* UI stays at 13: body copy, nav, buttons */
+  --t-ui: 13px;
+  /* Data bumped from 11.5→12: metric labels, timestamps, chips */
+  --t-data: 12px;
+  /* Micro bumped from 9.5→10: status badges, non-essential annotations */
+  --t-micro: 10px;
+}
+
+/* ================================================================
+   2. NAV / HEADER — bump primary and secondary navigation
+   ================================================================ */
+/* Sub-tabs keep the 13px floor. The PRIMARY nav, the MORE trigger/menu and
+   the micro strip were removed from this block (design pass 1): their sizes
+   are owned by Header.svelte, and an !important here would pin them forever. */
+.subtabs button {
+  font-size: 13px !important;
+}
+
+/* Header mode line */
+.header-mode {
+  font-size: 10px !important;
+}
+
+/* Clock */
+.clock span {
+  font-size: 11px !important;
+}
+.clock b {
+  font-size: 22px;
+}
+
+/* ================================================================
+   3. PANEL TITLES — all h2 headings reach ≥15px
+   ================================================================ */
+.panel h2,
+.dashboard-left h2,
+.dashboard-right h2,
+.dashboard-lower h2,
+.command-dock h2,
+.auth-gate h2,
+.detail-drawer header h2,
+.about-page h2 {
+  font-size: var(--t-section) !important;
+}
+.about-page h1 {
+  font-size: var(--t-title) !important;
+}
+
+/* Section sub-headings (h3) */
+.rail-block h3,
+.sub,
+.recent h3,
+.security-decision h3,
+.matrix-head h3 {
+  font-size: 13px !important;
+}
+
+/* ================================================================
+   4. BODY COPY — readable UI text never drops below 12px
+   ================================================================ */
+body, #app {
+  font-size: var(--t-ui) !important;
+}
+
+/* All body-type elements */
+.objective-copy small,
+.recent p,
+.processes p,
+.rail-note,
+.about-page p,
+.auth-gate p,
+.auth-gate small,
+.unavailable p,
+.setting-list small,
+.module-list small,
+.agent-grid small,
+.agent-grid p,
+.notice-popover p,
+.command-palette p,
+.core-status-line,
+.goal-line,
+.objective-idle p,
+.settings-note,
+.command-palette > div button span,
+.notice-popover > button span {
+  font-size: 13px !important;
+}
+
+/* Generous body copy (objective copy, recent, etc.) */
+.objective-copy small,
+.recent p,
+.processes p,
+.setting-list small,
+.module-list small,
+.agent-grid small {
+  font-size: 12px !important;
+}
+
+/* Rail notes and about page */
+.rail-note,
+.unavailable p,
+.about-page p {
+  font-size: 13px !important;
+}
+
+/* Command line — typed commands and the hint line were 8-11px */
+.command input,
+.dashboard-operations .command input,
+.command-dock .command input {
+  font-size: 12px !important;
+}
+.command-help,
+.dashboard-operations .command-help,
+.command-dock .command-help {
+  font-size: clamp(11px, .58vw, 12px) !important;
+}
+
+/* ================================================================
+   5. DATA LABELS / METRIC GRID — bump from 10→11px minimum
+   ================================================================ */
+.metric-grid span,
+.metric-grid small,
+.processes p,
+dt,
+.net-count span,
+.process-values span,
+.security-row span,
+.rail-kv span,
+.signal-grid span,
+.matrix-grid > div span,
+.stack-grid span {
+  font-size: 11px !important;
+}
+
+.metric-grid small {
+  font-size: var(--t-micro) !important;
+}
+
+/* Data values (b tags inside metric/process/net-count) */
+.process-values b {
+  font-size: 19px !important;
+}
+.net-count b {
+  font-size: clamp(14px, .85vw, 18px) !important;
+}
+.threat-counts b {
+  font-size: clamp(14px, .8vw, 17px) !important;
+}
+
+/* ================================================================
+   6. SECONDARY PAGES — fix microscopic content in sparse panels
+   ================================================================ */
+/* Module tiles */
+.module-tile .tile-name {
+  font-size: 12px !important;
+}
+
+/* Node chain (agent pipeline nodes) */
+.node-chain b {
+  font-size: 11px !important;
+}
+.node-chain .node-state {
+  font-size: 10.5px !important;
+}
+.node-chain small {
+  font-size: 9.5px !important;
+}
+
+/* Event list rows */
+.event-list button,
+.event-list div {
+  font-size: 12.5px !important;
+}
+.event-list time {
+  font-size: 11px !important;
+}
+.event-list b.chip {
+  font-size: 11px !important;
+}
+
+/* Mini events */
+.mini-events > div {
+  font-size: 11px !important;
+}
+.mini-events time {
+  font-size: 10px !important;
+}
+
+/* Timeline tabs */
+.tl-tabs button {
+  font-size: 10px !important;
+  padding: 3px 10px !important;
+}
+
+/* Security rows */
+.dashboard-right .security-row {
+  font-size: 11px !important;
+}
+
+/* ================================================================
+   7. STATUS / CHIPS — minimum readable status badges
+   ================================================================ */
+.status {
+  font-size: var(--t-micro) !important;
+}
+.security-freshness {
+  font-size: 10px !important;
+}
+
+/* ================================================================
+   8. NETWORK PANEL — topology + globe text
+   ================================================================ */
+.topology-chain {
+  font-size: clamp(8px, .5vw, 9.5px) !important;
+}
+.net-count span {
+  font-size: clamp(9px, .58vw, 11px) !important;
+}
+
+/* ================================================================
+   9. DASHBOARD LOWER — event timeline, objective, quick actions
+   ================================================================ */
+.dashboard-lower h2 {
+  font-size: var(--t-section) !important;
+}
+.quick-grid button {
+  font-size: 12px !important;
+}
+.objective-idle {
+  font-size: 11px !important;
+}
+.objective-idle b {
+  font-size: 10px !important;
+}
+
+/* ================================================================
+   10. CORE CENTER — Zone C status strip.
+       POSITIONED by core-lanes.css (in-flow lane below the artwork);
+       only colour/weight states live here.
+   ================================================================ */
+.core-status-band b { font-weight: 700 !important; color: var(--text) !important; }
+.core-status-band b.ok  { color: var(--green) !important; }
+.core-status-band b.warn { color: var(--amber) !important; }
+.core-status-band b.bad { color: var(--red) !important; }
+
+/* ================================================================
+   11. CORE CENTER — Zone A hero text (agent state).
+       POSITIONED by core-lanes.css; font sizes defined here.
+   ================================================================ */
+.agent-state span {
+  font-size: 12px !important;
+  letter-spacing: .22em !important;
+}
+.agent-state h1 {
+  font-size: 30px !important;
+  letter-spacing: .14em !important;
+}
+.agent-state p {
+  font-size: 11px !important;
+}
+
+/* Core text must paint ABOVE the robot (spec layer 60 over layer 30): the
+   alpha PNG is opaque across the whole subject, so the hero stack can no
+   longer rely on showing through a mask-faded image. */
+.agent-state,
+.voice-waveform,
+.core-status-line,
+.core-status-band {
+  z-index: 6 !important;
+}
+
+/* Zone B: waveform + one contextual sentence. Their X/Y belong to the
+   core-text lane (core-lanes.css); only the sentence size is owned here. */
+.core-status-line {
+  font-size: 12px !important;
+}
+
+/* Waveform caption */
+.wave-caption {
+  font-size: 10px !important;
+}
+
+/* State ladder (right-side rung labels — decorative but legible) */
+.state-ladder {
+  font-size: 10px !important;
+}
+
+/* Core top bar */
+.core-top {
+  font-size: 10px !important;
+}
+
+/* ================================================================
+   12. OPERATIONS PAGE — raise all ops-element sizes
+   ================================================================ */
+/* Status strip */
+.ops-status-strip {
+  font-size: 11px !important;
+}
+.ops-status-strip .status-item b {
+  font-size: 11px !important;
+}
+
+/* Section headings */
+.ops-section h2 {
+  font-size: var(--t-section) !important;
+}
+
+/* Process table */
+.ops-process-table {
+  font-size: 12px !important;
+}
+.ops-process-table .proc-head {
+  font-size: 10px !important;
+}
+.ops-process-empty {
+  font-size: 12px !important;
+}
+
+/* Metric cards */
+.ops-metric-card .metric-label {
+  font-size: 10px !important;
+}
+.ops-metric-card .metric-value {
+  font-size: 22px;
+}
+.ops-metric-card .metric-detail {
+  font-size: 11px !important;
+}
+
+/* Agent/task detail */
+.ops-agent-grid .ops-dl dt {
+  font-size: 10px !important;
+}
+.ops-agent-grid .ops-dl dd {
+  font-size: 12px !important;
+}
+
+/* Notes */
+.ops-note {
+  font-size: 11px !important;
+}
+
+/* Objective detail */
+.ops-objective b {
+  font-size: 10px !important;
+}
+.ops-objective p {
+  font-size: 12px !important;
+}
+
+/* Empty state */
+.ops-empty {
+  font-size: 12px !important;
+}
+
+/* ================================================================
+   13. FOOTER — stays small but legible
+   ================================================================ */
+.hud-footer {
+  font-size: 10px !important;
+}
+.footer-signature span:first-child {
+  font-size: 10px;
+}
+
+/* ================================================================
+   14. COMPACT CSS ORPHANS — ensure compact overrides don't
+       re-shrink elements that core-readability just fixed.
+   ================================================================ */
+.compact .core-meta,
+.compact .task-progress,
+.compact .event-list b {
+  font-size: inherit !important;
+}
+
+/* ================================================================
+   15. RESPONSIVE — height-aware text preservation.
+       At lower heights, reduce PADDING — never text.
+   ================================================================ */
+@media (max-height: 800px) {
+  /* Shorter screens lose PADDING and decoration, never text. The core hero
+     state can step down slightly only while staying within the 22-36px band.
+     Simpler DOM rows are left alone (the 4-row non-dashboard shell must not
+     be collapsed to 3). */
+  .app-shell {
+    padding: 8px;
+    gap: 6px;
+  }
+  .command-header {
+    padding: 6px 10px;
+  }
+  .agent-state h1 {
+    font-size: 26px !important;
+  }
+  .core-status-band {
+    gap: 10px;
+  }
+}
+
+@media (max-height: 700px) {
+  .app-shell {
+    padding: 6px;
+    gap: 5px;
+  }
+  .agent-state h1 {
+    font-size: 23px !important;
+  }
+  .core-status-band {
+    gap: 8px;
+  }
+  .state-ladder {
+    font-size: 9.5px !important;
+  }
+}
