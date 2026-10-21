@@ -43,7 +43,16 @@ disabled/
 tools/blender/preview/
 hud-v2/public/assets/3d/
 
-# Excluded from public source snapshots
+# Excluded local checks and unpublished drafts
 tests/
-docs/
 DESIGN.md
+PUBLISHING.md
+GITHUB.md
+MEMORY.md
+ARTICLE.md
+PREVIEW.png
+docs/*ROADMAP*
+docs/*PHASE*
+docs/*REFERENCE*
+docs/*.png
+tools/demo/
