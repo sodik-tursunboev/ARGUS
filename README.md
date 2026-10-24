@@ -1,5 +1,4 @@
-# ARGUS
-
+# ARGUS | Windows assistant by Sodik Tursunboev
 ARGUS is a local-first Windows assistant with voice interaction, a Svelte HUD,
 a FastAPI control plane, and guarded host actions. This repository publishes
 the general source code and the runtime media needed by the HUD. Local
