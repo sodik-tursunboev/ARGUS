@@ -99,6 +99,10 @@ This is a source release. It does not include a signed installer, voice model
 weights or the optional external 3D office asset pack. See
 [Setup and build](docs/BUILD.md) for prerequisites and limitations.
 
+## Author
+
+Built by **Sodik Tursunboev**. The case study, with the HUD screenshots and the security model, is at [sodik.eu/projects/argus](https://sodik.eu/projects/argus/), and the design story is in [the write-up](https://sodik.eu/writing/i-built-argus-a-local-first-ai-security-system-where-agents-can-think-but-cannot-grant/).
+
 ## Licence
 
 GPL-3.0-or-later. Copyright (C) 2026 Sodik Tursunboev. See [LICENSE](LICENSE)
